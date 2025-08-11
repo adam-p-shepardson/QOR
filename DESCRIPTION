@@ -1,0 +1,23 @@
+Package: QOR
+Title: Functions to Identify "Who Can Vote" in "What School District"
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Adam", "Shepardson", , "apshepardson@albany.edu", role = c("aut", "cre"), comments = c(ORCID = "0009-0004-1153-8014")),
+    person("Melissa", "Lyon", , "mlyon@albany.edu", role = c("ctb"), comments = c(ORCID = "0000-0002-4388-6337")))
+Description: Matching point geometries (e.g., voter locations) to polygon geometries (e.g., school districts) 
+    using spatial intersections and distances. The package implements the "Query, Overlay, Recover" (QOR) method from CITE, 
+    which is a three-step process to identify which voters live in which school districts. QOR may be generalizable to
+    other sets of point and polygon geometries, although the package is currently designed for education research applications. 
+License: MIT + file LICENSE
+Encoding: UTF-8
+Imports:
+    sf,
+    tidyverse,
+    dplyr,
+    ggthemes,
+    patchwork,
+    haven,
+    tidygeocoder,
+    tictoc
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
