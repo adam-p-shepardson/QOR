@@ -37,4 +37,5 @@ Cambon J., Hernangómez D., Belanger C., Possenriede D. (2021).
   tidygeocoder: An R package for geocoding. Journal of Open Source
   Software, 6(65), 3544, https://doi.org/10.21105/joss.03544 (R package
   version 1.0.6)
+  
 Wickham, H. (2019). Advanced R, Second Edition. Chapman & Hall/CRC. Accessed at https://adv-r.hadley.nz/
