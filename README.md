@@ -3,7 +3,9 @@ The QOR package contains functions for implementing the Query, Overlay, Recover 
 
 Although QOR originally focused on linking voters to specific school districts, it is also possible to substitute the addresses of some other entity of interest (e.g., specific schools, businesses, etc...) into the code. Similarly, rather than matching such entities to school districts, QOR can facilitate placing research subjects within the bounds of any shapefiles one has on hand (e.g., special administrative districts broadly-speaking). We recognize these potential external applications despite focusing our attention on a persistent voter identification problem in school board election research.
 
-CURRENT CITATION: Working Paper will be cited here when finished.
+# Citation
+If you use the QOR package or the QOR method in your research, please cite our work as follows:
+CURRENT CITATION: 
 
 # The QOR Method: Query, Overlay, Recover
 Query, Overlay, Recover is a set of interwoven geospatial data management strategies which help address longstanding challenges in identifying "Who Votes" in school board elections. The process follows three simple steps:
@@ -37,5 +39,5 @@ Cambon J., Hernangómez D., Belanger C., Possenriede D. (2021).
   tidygeocoder: An R package for geocoding. Journal of Open Source
   Software, 6(65), 3544, https://doi.org/10.21105/joss.03544 (R package
   version 1.0.6)
-  
+
 Wickham, H. (2019). Advanced R, Second Edition. Chapman & Hall/CRC. Accessed at https://adv-r.hadley.nz/
