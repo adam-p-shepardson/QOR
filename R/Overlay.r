@@ -113,7 +113,7 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
     } 
     for(vid in in_multipledistricts) { # If in several districts, only extract closest *of these*
       # Filter statedistances dataset to just a single point_id, and then only the rows containing the polygon_ids point_id is in; extract closest polygon_id
-      data <- distances %>% dplyr::filter(., point_id == vid & polygon_id %in% polygons$polygon_id[intersections[[which(coord$point_id == vid)]]]) %>% dplyr::slice_min(distance, n = 1)
+      data <- distances %>% dplyr::filter(., point_id == vid & polygon_id %in% polygons$polygon_id[intersections[[which(points$point_id == vid)]]]) %>% dplyr::slice_min(distance, n = 1)
       # Store in districtset
       districtset$polygon_id[districtset$point_id == vid] <- data$polygon_id
       districtset$distance[districtset$point_id == vid] <- data$distance
