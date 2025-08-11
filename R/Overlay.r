@@ -12,9 +12,11 @@
 #' @param polygons sf object containing polygon geometries (e.g., school districts)
 #' @param point_id name of the column in the points sf object that contains the unique identifiers for each point (default: "point_id")
 #' @param polygon_id name of the column in the polygons sf object that contains the unique identifiers for each polygon (default: "polygon_id")
+#' @param used_NCES boolean indicating whether the user inputed NCES school district shapefiles or other shapefiles with a state_FIPS code as the polygons (default: TRUE)
+#' @param state_FIPS state FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state)
 #' @return tibble dataset with three columns: point_id, polygon_id, and distance (to internal point), where each point_id is matched to ONE polygon_id.
 #' @export
-overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polygon_id = "polygon_id") {
+overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polygon_id = "polygon_id", used_NCES = TRUE, state_FIPS = NULL) {
   
   # Check that the inputs are valid
   if (is.null(points) || is.null(polygons)) {
@@ -23,6 +25,8 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
     stop("Both points and polygons must be sf objects (convert to sf format using functions from sf package).")
   } else if (!point_id %in% names(points) || !polygon_id %in% names(polygons)) {
     stop(paste("The point_id ('", point_id, "') or polygon_id ('", polygon_id, "') is not found in the respective datasets.", sep = ""))
+  } else if (used_NCES == TRUE & is.null(state_FIPS)) {
+    warning(paste("Raw NCES school district shapefiles are national and we can use a State FIPS code to filter them. We suggest providing a value for state_FIPS code (e.g., '37' for North Carolina)."))
   } else { # Can proceed after equalizing crs
     # Clean up geometries
     points <- points %>%
@@ -35,6 +39,18 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
     # Convert custom names to standard names
     colnames(points)[colnames(points) == point_id] <- "point_id" 
     colnames(polygons)[colnames(polygons) == polygon_id] <- "polygon_id"
+
+    # If NCES shapefiles, can filter polygons to the state FIPS code
+    if (used_NCES == TRUE & is.null(state_FIPS)) {
+      warning(paste("Raw NCES school district shapefiles are national and we can use a State FIPS code to filter them. We suggest providing a value for state_FIPS code (e.g., '37' for North Carolina)."))
+    } else if (used_NCES == TRUE & !is.null(state_FIPS)) {
+      temp <- polygons %>% dplyr::rename_with(tolower) 
+      colnames(polygons)[startsWith(names(temp), "state")] <- "state_fips"
+      polygons <- polygons %>%
+      dplyr::mutate(state_fips = as.character(.data$state_fips)) %>%
+      dplyr::filter(., state_fips == as.character(state_FIPS)) # filters polygons to the state FIPS code
+      rm(temp)
+    }
   }
   
   tictoc::tic.clearlog() # clear time log in case you have a prior run
@@ -71,8 +87,8 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
   distances$distance <- as.numeric(distances$distance) # remove units so that minimum calculation works. Note: all values still in m (meters) by default
 
   # Print the point_ids for any points in multiple or no polygons
-  message("These point_ids were in multiple polygons:", in_multipledistricts)
-  message("These point_ids were in no polygons:", in_nodistricts)
+  message(paste0("These point_ids were in multiple polygons:", as.character(in_multipledistricts)))
+  message(paste0("These point_ids were in no polygons:", as.character(in_nodistricts)))
   
   tictoc::toc(log = TRUE) # print Point-Polygon Distance calculation time
   
@@ -90,7 +106,7 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
     for(vid in in_onedistrict) { # Vast majority of, if not all, cases: Check if in one polygon. Extract that pid.
       # Ticker
       id_count <- id_count + 1
-      print(paste0("Now assigning a polygon to point_id # ", as.character(id_count), " out of the ", as.character(length(in_onedistrict)), " point_id's in only one polygon"))
+      message(paste0("Now assigning a polygon to point_id # ", as.character(id_count), " out of the ", as.character(length(in_onedistrict)), " point_id's in only one polygon"))
       
       # Find row # in points for point_id, then feed this row # into intersections to get row # of overlapping polygon in polygons, then feed this row # into polygons$pid to get pid, then store in districtset.
       districtset$polygon_id[districtset$point_id == vid] <- polygons$polygon_id[intersections[[which(points$point_id == vid)]]]
