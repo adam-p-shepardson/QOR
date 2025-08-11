@@ -8,7 +8,9 @@ overlay(
   points = NULL,
   polygons = NULL,
   point_id = "point_id",
-  polygon_id = "polygon_id"
+  polygon_id = "polygon_id",
+  used_NCES = TRUE,
+  state_FIPS = NULL
 )
 }
 \arguments{
@@ -19,15 +21,20 @@ overlay(
 \item{point_id}{name of the column in the points sf object that contains the unique identifiers for each point (default: "point_id")}
 
 \item{polygon_id}{name of the column in the polygons sf object that contains the unique identifiers for each polygon (default: "polygon_id")}
+
+\item{used_NCES}{boolean indicating whether the user inputed NCES school district shapefiles or other shapefiles with a state_FIPS code as the polygons (default: TRUE)}
+
+\item{state_FIPS}{state FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state)}
 }
 \value{
 tibble dataset with three columns: point_id, polygon_id, and distance (to internal point), where each point_id is matched to ONE polygon_id.
 }
 \description{
 The overlay() function performs the "Overlay" (Step 2) operation from the QOR Method.
-This function matches point geometries (e.g., voter locations) to polygon geometries (e.g., school districts) using spatial intersections and distances.
-It requires that all points and polygons each have a unique identifier column. If observations are not unique, then the function will not work as intended.
-E.g., if you have panel data, you should use ONE time unit per functional call (e.g., all voters in one year, then all voters in the next year, etc.).
-Importantly, the function returns matches that assign ONE polygon to each point, which is the polygon that the point is in, or the closest polygon (based on internal point)
-if the point is not in any polygon. Modify the code accordingly if you want to return multiple polygons for each point.
+This function matches point geometries (e.g., voter locations) to polygon geometries (e.g., school districts) using spatial
+intersections and distances. It requires that all points and polygons each have a unique identifier column. If observations
+are not unique, then the function may not work as intended. E.g., if you have panel data, you should use ONE timepoint per
+functional call (e.g., all voters in one year, then all voters in the next year, etc.). Importantly, the function returns
+matches that assign ONE polygon to each point, which is the polygon that the point is in, or the closest polygon (based on
+internal point) if the point is not in any polygon. Modify the code if you want to return multiple polygons per point.
 }

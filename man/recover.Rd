@@ -11,13 +11,16 @@ recover(
   unit_id = "unit_id",
   unit_zip = "postalcode",
   polygon_id = "polygon_id",
-  zip_id = "postalcode"
+  zip_id = "postalcode",
+  state_shape = NULL,
+  used_NCES = TRUE,
+  state_FIPS = NULL
 )
 }
 \arguments{
 \item{units}{dataframe object containing voter information (needs to have unique ID and then a zipcode variable)}
 
-\item{polygons}{sf object containing polygon geometries (e.g., school districts)}
+\item{polygons}{sf object containing polygon geometries (e.g., school districts).}
 
 \item{zipcodes}{sf object containing zipcode tabulation area geometries (ZCTAs)}
 
@@ -28,6 +31,12 @@ recover(
 \item{polygon_id}{name of the column in the polygons sf object that contains the unique identifiers for each polygon (default: "polygon_id")}
 
 \item{zip_id}{name of the column in the zipcodes sf object that contains the unique identifiers for each zipcode (default: "postalcode")}
+
+\item{state_shape}{sf object containing the shape of the state (used to filter zipcodes to the state)}
+
+\item{used_NCES}{boolean indicating whether the user inputed NCES school district shapefiles or other shapefiles with a state_FIPS code as the polygons (default: TRUE)}
+
+\item{state_FIPS}{state FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state)}
 }
 \value{
 tibble dataset with five columns: unit_id, polygon_id, postalcode, distance, and a binary flag for matched_byzip, where each unit_id is matched to ONE polygon_id.
@@ -35,9 +44,10 @@ tibble dataset with five columns: unit_id, polygon_id, postalcode, distance, and
 \description{
 The recover() function performs the "Recover" (Step 3) operation from the QOR Method.
 This function assigns units (e.g., voters) to polygon geometries (e.g., school districts) using zipcodes as spatial cross-walks.
-It requires that all units, polygons, and zipcodes each have a unique identifier column. If observations are not unique, then this function may not work as intended.
-E.g., if you have panel data, you should use ONE time unit per functional call (e.g., all voters in one year, then all voters in the next year, etc.).
-Importantly, the function returns matches that assign ONE polygon to each unit, which is the polygon whose internal point is closest to the center of that unit's zipcode.
-The "Recover" operation is intended to be used for cases where the "Query" operation fails to convert an address to a point geometry.
-Modify the code accordingly if you want to return multiple polygons for each unit.
+It requires that all units, polygons, and zipcodes each have a unique identifier column. If observations are not unique,
+then this function may not work as intended. E.g., if you have panel data, you should use ONE timepoint per functional call (all voters
+in one year, then all voters in the next year, etc.). Importantly, the function returns matches that assign ONE polygon to each unit,
+which is the polygon whose internal point is closest to the center of that unit's zipcode. The "Recover" operation is intended to be used
+for cases where the "Query" operation fails to convert an address to a point geometry. Modify the code if you want to return
+multiple polygons for each unit.
 }
