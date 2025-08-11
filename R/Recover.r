@@ -4,9 +4,9 @@
 #' This function assigns units (e.g., voters) to polygon geometries (e.g., school districts) using zipcodes as spatial cross-walks.
 #' It requires that all units, polygons, and zipcodes each have a unique identifier column. If observations are not unique, 
 #' then this function may not work as intended. E.g., if you have panel data, you should use ONE timepoint per functional call (all voters 
-#' in one year, then all voters in the next year, etc.). Importantly, the function returns matches that assign ONE polygon to each unit, 
-#' which is the polygon whose internal point is closest to the center of that unit's zipcode. The "Recover" operation is intended to be used 
-#' for cases where the "Query" operation fails to convert an address to a point geometry. Modify the code if you want to return 
+#' in one year, then all voters from the next year in a second call, etc.). The function returns matches that assign ONE polygon_id to each unit, 
+#' which is the polygon_id whose internal point is closest to the center of that unit's zipcode. The "Recover" operation is intended to be used 
+#' for cases where the "Query" operation fails to convert an address to a point geometry. You will need to modify the code if you want to return 
 #' multiple polygons for each unit.
 #'
 #' @param units dataframe object containing voter information (needs to have unique ID and then a zipcode variable)

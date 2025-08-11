@@ -6,9 +6,9 @@
 #' are not unique, then the function may not work as intended. E.g., if you have panel data, you should use ONE timepoint per 
 #' functional call (e.g., all voters in one year, then all voters in the next year, etc.). Importantly, the function returns 
 #' matches that assign ONE polygon to each point, which is the polygon that the point is in, or the closest polygon (based on 
-#' internal point) if the point is not in any polygon. Modify the code if you want to return multiple polygons per point.
+#' internal point) if the point is not in any polygon. You will need to modify the code if you want to return multiple polygons per point.
 #'
-#' @param points sf object containing point geometries (e.g., voter locations)
+#' @param points sf object containing point geometries for units (e.g., voter locations)
 #' @param polygons sf object containing polygon geometries (e.g., school districts)
 #' @param point_id name of the column in the points sf object that contains the unique identifiers for each point (default: "point_id")
 #' @param polygon_id name of the column in the polygons sf object that contains the unique identifiers for each polygon (default: "polygon_id")
