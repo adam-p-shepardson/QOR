@@ -3,6 +3,7 @@ The QOR package contains functions for implementing the Query, Overlay, Recover 
 
 # Citation
 Please cite our work as follows:
+
 CURRENT CITATION
 
 # Query, Overlay, Recover
