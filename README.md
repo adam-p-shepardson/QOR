@@ -37,6 +37,15 @@ To install the QOR package, use the following code in R:
 # Minimal Data Requirements
 QOR requires voter postal addresses, school district shapefiles, zipcode shapefiles, and a state boundary shapefile, with any time-varying shapes ideally obtained on a yearly basis. These undemanding data requirements can also accommodate paid voter files (including popular products from vendors L2 and Catalist) provided these products contain registration address information. We have set up several years of the [NCES school district shapefiles](https://www.dropbox.com/scl/fo/cq8l368nr0lfuq663g6id/AJarAbqc0PS9RAD_vbZ9ZpM?rlkey=4gviqpiehyufriffkue8371ga&st=twam8we4&dl=0) and [Census TIGER/LINE zipcode shapefiles](https://www.dropbox.com/scl/fo/nkvfbrzxe4lvlhowmy6j6/ACOSb9wP8kEjkEPIXC4XZSg?rlkey=zfp9wy70vehfil2reu7youbxn&st=dxnfczu0&dl=0) for use with QOR in Dropbox folders tied to this project. Note that it is difficult to download unzipped folders from Dropbox directly in R, and downloading the .zip file versions we have provided is much easier. 
 
+For example, it is possible to copy a viewer link to .zip folders from Dropbox and unzip them in R like so:
+```R
+# Download
+utils::download.file(url = "YOUR URL", destfile = "ZIP FOLDER DESTINATION PATH", mode = "wb", method = "auto")
+
+# Unzip
+utils::unzip(zipfile = "FILE NAME FROM 'destfile' ABOVE", exdir = "EXTRACTION PATH")
+```
+
 Additional years of the preferred shapefiles can be obtained from the U.S. Census Bureau's [TIGER/Line Shapefiles page](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html) and the NCES Education Demographic and Geographic Estimates (EDGE) [program page](https://nces.ed.gov/programs/edge/Geographic/DistrictBoundaries). Users are advised to exercise caution and to view our functions' source code if substituting their own shapefiles. Users are also advised to understand the limitations of even the NCES shapefiles, which only update boundaries yearly from 2017 onward, and are updated biannually prior to 2017 (though documentation suggests that they are still re-posted every year in a manner that aligns with Census TIGER/LINE database updates). We treat the NCES shapefiles as the best available option for school district boundaries, and have stored copies of the closest shapefiles to each school year, but recognize that they are not perfect.
 
 Although QOR focuses on linking voters to specific school districts, it is also possible to substitute the addresses of some other entity of interest (e.g., specific schools, businesses, etc...) into the code. Similarly, rather than matching such entities to school districts, QOR can facilitate placing research subjects within the bounds of any shapefiles one has on hand (e.g., special administrative districts broadly-speaking). We recognize these potential external applications despite focusing our attention on a persistent voter identification problem in political research about school board elections.
