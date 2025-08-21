@@ -22,7 +22,7 @@ Superimpose school district shapefiles onto voter point geometries and exploit s
 For the small portion of voters who cannot be located through an exact address match, assign the nearest school district to their registration zipcode. The _recover()_ function takes in units (with zipcodes), school district polygon geometries, and zipcode polygon geometries with unique identifer columns. It then calculates distances between the centroids for each zipcode and internal points for each school district, and returns a dataset that matches each voter to their nearest school district based on these new points.
 
 # TL;DR
-The three steps highlighted in broad terms above provide an easy-to-understand logic that readily translates into tangible code. We have provided template code to the public via this repository and welcome the use and modification of our code, with proper citation. Each step corresponds to a function in the QOR package:
+We provide template code for matching voters to school districts via this repository and welcome the use and modification of our code, with proper citation. Each step corresponds to a function in the QOR package:
 - _query()_ for geocoding addresses into point geometries
 - _overlay()_ for matching point geometries to polygon geometries (likely has the most general utility)
 - _recover()_ for assigning unmatched points to polygons based on zipcode centroids
