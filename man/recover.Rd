@@ -2,7 +2,7 @@
 % Please edit documentation in R/Recover.r
 \name{recover}
 \alias{recover}
-\title{Recover Failed Point (e.g., Voter) to Polygon (e.g., School District) Matches using Zipcodes}
+\title{Recover Failed Point-to-Polygon Matches Using Zipcodes}
 \usage{
 recover(
   units = NULL,
@@ -18,36 +18,40 @@ recover(
 )
 }
 \arguments{
-\item{units}{dataframe object containing voter information (needs to have unique ID and then a zipcode variable)}
+\item{units}{Dataframe or tibble containing unit information (must have unique ID and a zipcode variable).}
 
 \item{polygons}{sf object containing polygon geometries (e.g., school districts).}
 
-\item{zipcodes}{sf object containing zipcode tabulation area geometries (ZCTAs)}
+\item{zipcodes}{sf object containing zipcode tabulation area geometries (ZCTAs).}
 
-\item{unit_id}{name of the column in the units dataframe that contains the unique identifiers for each unit (default: "unit_id")}
+\item{unit_id}{Name of the column in the units dataframe that contains unique identifiers for each unit (default: "unit_id").}
 
-\item{unit_zip}{name of the column in the units dataframe that contains the zipcodes (default: "postalcode")}
+\item{unit_zip}{Name of the column in the units dataframe that contains the zipcodes (default: "postalcode").}
 
-\item{polygon_id}{name of the column in the polygons sf object that contains the unique identifiers for each polygon (default: "polygon_id")}
+\item{polygon_id}{Name of the column in the polygons sf object that contains unique identifiers for each polygon (default: "polygon_id").}
 
-\item{zip_id}{name of the column in the zipcodes sf object that contains the unique identifiers for each zipcode (default: "postalcode")}
+\item{zip_id}{Name of the column in the zipcodes sf object that contains unique identifiers for each zipcode (default: "postalcode").}
 
-\item{state_shape}{sf object containing the shape of the state (used to filter zipcodes to the state)}
+\item{state_shape}{sf object containing the shape of the state (used to filter zipcodes to the state).}
 
-\item{used_NCES}{boolean indicating whether the user inputed NCES school district shapefiles or other shapefiles with a state_FIPS code as the polygons (default: TRUE)}
+\item{used_NCES}{Boolean indicating whether the user input NCES school district shapefiles or other shapefiles with a state_FIPS code as the polygons (default: TRUE).}
 
-\item{state_FIPS}{state FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state)}
+\item{state_FIPS}{State FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state).}
 }
 \value{
-tibble dataset with five columns: unit_id, polygon_id, postalcode, distance, and a binary flag for matched_byzip, where each unit_id is matched to ONE polygon_id.
+A tibble with five columns: unit_id, polygon_id, postalcode, distance, and a binary flag for matched_byzip, where each unit_id is matched to one polygon_id.
 }
 \description{
-The recover() function performs the "Recover" (Step 3) operation from the QOR Method.
-This function assigns units (e.g., voters) to polygon geometries (e.g., school districts) using zipcodes as spatial cross-walks.
-It requires that all units, polygons, and zipcodes each have a unique identifier column. If observations are not unique,
-then this function may not work as intended. E.g., if you have panel data, you should use ONE timepoint per functional call (all voters
-in one year, then all voters in the next year, etc.). Importantly, the function returns matches that assign ONE polygon to each unit,
-which is the polygon whose internal point is closest to the center of that unit's zipcode. The "Recover" operation is intended to be used
-for cases where the "Query" operation fails to convert an address to a point geometry. Modify the code if you want to return
-multiple polygons for each unit.
+The \code{recover()} function performs the "Recover" (Step 3) operation from the QOR Method.
+}
+\details{
+This function:
+\itemize{
+\item Assigns units (e.g., voters) to polygon geometries (e.g., school districts) using zipcodes as a spatial crosswalk.
+\item Requires that all units, polygons, and zipcodes each have a unique identifier column.
+\item If observations are not unique (e.g., panel data), use only one timepoint per function call (e.g., all voters in one year, then all voters from the next year, etc.).
+\item Returns a match that assigns \strong{one} polygon to each unit: the polygon whose internal point is closest to the centroid of that unit's zipcode.
+\item Intended for cases where the "Query" operation fails to convert an address to a point geometry.
+\item To return multiple polygons per unit, you will need to modify the code.
+}
 }

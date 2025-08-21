@@ -12,12 +12,14 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Imports:
     sf,
+    magrittr,
     tidyverse,
     dplyr,
-    ggthemes,
-    patchwork,
-    haven,
     tidygeocoder,
     tictoc
+Suggests:
+    patchwork,
+    ggthemes,
+    haven
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2

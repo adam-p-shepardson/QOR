@@ -2,7 +2,7 @@
 % Please edit documentation in R/Overlay.r
 \name{overlay}
 \alias{overlay}
-\title{Match Point Geometries (e.g., Voter Locations) to Polygon Geometries (e.g., School Districts)}
+\title{Match Point Geometries to Polygon Geometries (e.g., Voter Locations to School Districts)}
 \usage{
 overlay(
   points = NULL,
@@ -14,27 +14,31 @@ overlay(
 )
 }
 \arguments{
-\item{points}{sf object containing point geometries (e.g., voter locations)}
+\item{points}{sf object containing point geometries for units (e.g., voter locations).}
 
-\item{polygons}{sf object containing polygon geometries (e.g., school districts)}
+\item{polygons}{sf object containing polygon geometries (e.g., school districts).}
 
-\item{point_id}{name of the column in the points sf object that contains the unique identifiers for each point (default: "point_id")}
+\item{point_id}{Name of the column in the points sf object that contains unique identifiers for each point (default: "point_id").}
 
-\item{polygon_id}{name of the column in the polygons sf object that contains the unique identifiers for each polygon (default: "polygon_id")}
+\item{polygon_id}{Name of the column in the polygons sf object that contains unique identifiers for each polygon (default: "polygon_id").}
 
-\item{used_NCES}{boolean indicating whether the user inputed NCES school district shapefiles or other shapefiles with a state_FIPS code as the polygons (default: TRUE)}
+\item{used_NCES}{Boolean indicating whether the user input NCES school district shapefiles or other shapefiles with a state_FIPS code as the polygons (default: TRUE).}
 
-\item{state_FIPS}{state FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state)}
+\item{state_FIPS}{State FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state).}
 }
 \value{
-tibble dataset with three columns: point_id, polygon_id, and distance (to internal point), where each point_id is matched to ONE polygon_id.
+A tibble with three columns: point_id, polygon_id, and distance (to internal point), where each point_id is matched to one polygon_id.
 }
 \description{
-The overlay() function performs the "Overlay" (Step 2) operation from the QOR Method.
-This function matches point geometries (e.g., voter locations) to polygon geometries (e.g., school districts) using spatial
-intersections and distances. It requires that all points and polygons each have a unique identifier column. If observations
-are not unique, then the function may not work as intended. E.g., if you have panel data, you should use ONE timepoint per
-functional call (e.g., all voters in one year, then all voters in the next year, etc.). Importantly, the function returns
-matches that assign ONE polygon to each point, which is the polygon that the point is in, or the closest polygon (based on
-internal point) if the point is not in any polygon. Modify the code if you want to return multiple polygons per point.
+The \code{overlay()} function performs the "Overlay" (Step 2) operation from the QOR Method.
+}
+\details{
+This function:
+\itemize{
+\item Matches point geometries (e.g., voter locations) to polygon geometries (e.g., school districts) using spatial intersections and distances.
+\item Requires that all points and polygons each have a unique identifier column.
+\item If observations are not unique (e.g., panel data), use only one timepoint per function call (e.g., all voters in one year, then all voters in the next year, etc.).
+\item Returns a match that assigns \strong{one} polygon to each point: the polygon the point is in, or the closest polygon (based on internal point) if the point is not in any polygon.
+\item To return multiple polygons per point, you will need to modify the code.
+}
 }

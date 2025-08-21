@@ -2,40 +2,57 @@
 % Please edit documentation in R/Query.r
 \name{query}
 \alias{query}
-\title{Geocode Unit (Voter) Addresses to Long/Lat Coordinates}
+\title{Geocode Unit (Voter) Addresses to Longitude/Latitude Coordinates}
 \usage{
 query(
   units = NULL,
+  unit_id = "unit_id",
   street = "street",
   city = "city",
   state = "state",
   state_shape = NULL,
   units_per_batch = 4000,
-  year = NULL
+  year = NULL,
+  method = "census",
+  sleep_time = 2,
+  zip_id = "postalcode"
 )
 }
 \arguments{
-\item{units}{dataframe object containing voter information (needs to have unique ID and then street, city, and state columns)}
+\item{units}{Dataframe or tibble containing voter information (must have unique ID, street, city, and state columns).}
 
-\item{street}{name of the column in the units dataframe that contains the street address (default: "street")}
+\item{unit_id}{Name of the column in the units dataframe that contains the unique identifiers for each unit (default: "unit_id").}
 
-\item{city}{name of the column in the units dataframe that contains the city (default: "city")}
+\item{street}{Name of the column in the units dataframe that contains the street address (default: "street").}
 
-\item{state}{name of the column in the units dataframe that contains the state (default: "state")}
+\item{city}{Name of the column in the units dataframe that contains the city (default: "city").}
 
-\item{state_shape}{sf object containing the shape of the state (used to filter geocoding results to the state, catching errors)}
+\item{state}{Name of the column in the units dataframe that contains the state (default: "state").}
 
-\item{units_per_batch}{number of units to geocode in each batch (conservative default: 4000)}
+\item{state_shape}{sf object containing the shape of the state (used to filter geocoding results to the state, catching errors).}
 
-\item{year}{of the data (default: NULL, which means no filtering by year)}
+\item{units_per_batch}{Number of units to geocode in each batch (default: 4000). Internet connectivity and API limits determine possibility of larger (or smaller) batches.}
+
+\item{year}{Year of the data (default: NULL, which throws an error). Program was designed for years 2007 through 2023. Years < 2007 will use the 2010 Census database, and years > 2023 will use the 2023 ACS database.}
+
+\item{method}{Geocoding method to use (default: "census"). See methods from tidygeocoder::geocode(). We recommend "census" for best cost (free). You may need to adjust parts of code that set variable names if using different method.}
+
+\item{sleep_time}{Time to pause between batches (default: 2 seconds). Try increasing if you are getting rate-limited by the geocoding service or encountering connection issues.}
+
+\item{zip_id}{OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Output will have a postalcode column if provided, but this column will be NA if not provided.}
 }
 \value{
-list object with two items: 1. tibble of matched units with their geocoded coordinates, and 2. tibble of unmatched units (those that could not be geocoded).
+A list with two items: (1) Tibble of matched units with their geocoded coordinates, and (2) Tibble of unmatched units (those that could not be geocoded).
 }
 \description{
-The query() function performs the "Query" (Step 1) operation from the QOR Method.
-This function assigns units (e.g., voters) longitude and latitude coordinates based on
-their street address, city, and state. It is, functionally, a wrapper around tidygeocoder::geocode()
-that anticipates actions needed to process individual voter data and set up the next QOR Method steps.
-Importantly, it does not perform any matching to polygons or zip codes; it simply geocodes the addresses.
+The \code{query()} function performs the "Query" (Step 1) operation from the QOR Method.
+}
+\details{
+This function:
+\itemize{
+\item Assigns longitude and latitude coordinates to units (e.g., voters) based on their street address, city, and state.
+\item Acts as a wrapper around \code{tidygeocoder::geocode()}, while also handling additional processing needed for individual voter data and preparing for subsequent QOR Method steps.
+\item \strong{Note:} This function does not perform any matching to polygons or zip codes; it simply geocodes the addresses.
+\item Allows you to choose any geocoding service available in the \code{tidygeocoder} package (we recommend using the "census" method for best results).
+}
 }
