@@ -43,7 +43,7 @@ For example, it is possible to copy a viewer link to .zip folders from Dropbox a
 utils::download.file(url = "YOUR URL", destfile = "ZIP FOLDER DESTINATION PATH", mode = "wb", method = "auto")
 
 # Unzip
-utils::unzip(zipfile = "FILE/FOLDER NAME FROM 'destfile' ABOVE", exdir = "EXTRACTION PATH")
+utils::unzip(zipfile = "FILE/FOLDER PATH FROM 'destfile' ABOVE", exdir = "EXTRACTION PATH")
 ```
 
 Additional years of the preferred shapefiles can be obtained from the U.S. Census Bureau's [TIGER/Line Shapefiles page](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html) and the NCES Education Demographic and Geographic Estimates (EDGE) [program page](https://nces.ed.gov/programs/edge/Geographic/DistrictBoundaries). Users are advised to exercise caution and to view our functions' source code if substituting their own shapefiles. Users are also advised to understand the limitations of even the NCES shapefiles, which only update boundaries yearly from 2017 onward, and are updated biannually prior to 2017 (though documentation suggests that they are still re-posted every year in a manner that aligns with Census TIGER/LINE database updates). We treat the NCES shapefiles as the best available option for school district boundaries, and have stored copies of the closest shapefiles to each school year, but recognize that they are not perfect.
