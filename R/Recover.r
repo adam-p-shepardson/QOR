@@ -24,6 +24,7 @@
 #' @return A tibble with five columns: unit_id, polygon_id, postalcode, distance, and a binary flag for matched_byzip, where each unit_id is matched to one polygon_id.
 #'
 #' @importFrom dplyr filter mutate tibble rename_with slice_min
+#' @importFrom magrittr %>%
 #' @importFrom tidyr pivot_longer
 #' @importFrom tictoc tic.clearlog tic toc
 #' @importFrom sf st_make_valid st_transform st_point_on_surface st_crs st_filter st_centroid st_distance

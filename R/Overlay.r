@@ -19,6 +19,7 @@
 #' @return A tibble with three columns: point_id, polygon_id, and distance (to internal point), where each point_id is matched to one polygon_id.
 #'
 #' @importFrom dplyr filter mutate tibble rename_with slice_min
+#' @importFrom magrittr %>%
 #' @importFrom tidyr pivot_longer
 #' @importFrom tictoc tic.clearlog tic toc
 #' @importFrom sf st_make_valid st_transform st_point_on_surface st_crs st_intersects st_distance
