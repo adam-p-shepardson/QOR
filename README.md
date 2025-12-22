@@ -31,7 +31,7 @@ We provide template code for matching voters to school districts via this reposi
 To install the QOR package, use the following code in R:
 
 ```R 
- devtools::install_github("realadamshep/QOR")
+ devtools::install_github("adam-p-shepardson/QOR")
 ```
 
 # Minimal Data Requirements
