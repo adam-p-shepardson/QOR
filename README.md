@@ -50,4 +50,4 @@ Additional years of the preferred shapefiles can be obtained from the U.S. Censu
 
 Although QOR focuses on linking voters to specific school districts, it is also possible to substitute the addresses of some other entity of interest (e.g., specific schools, businesses, etc...) into the code. Similarly, rather than matching such entities to school districts, QOR can facilitate placing research subjects within the bounds of any shapefiles one has on hand (e.g., special administrative districts broadly-speaking). We recognize these potential external applications despite focusing our attention on a persistent voter identification problem in political research about school board elections.
 
-For additional notes on dependencies, computing environments, disclaimers, and external citations, please see the [Extra Notes](articles/extra-notes.html) page.
+For additional notes on dependencies, computing environments, disclaimers, and external citations, please see the [Extra Notes](https://adam-p-shepardson.github.io/QOR/articles/extra-notes.html) page.
