@@ -106,13 +106,13 @@ Then, we can prepare addresses for geocoding. Our example was written in Stata a
 
 - Rename address component variables to a standard format across the data years that you are using
 - Convert all address components/subcomponents to strings (e.g., string variables for street, city, postalcode, and state)
-- _Likely:_ construct the street address from subcomponents
-- Remove leading/trailing whitespace
+- _Likely Needed:_ construct the street address from subcomponents
+- Remove leading/trailing whitespace in all variables
 - _Optional:_ Construct full address string
 - Make sure to retain or generate a unique state voter (or other unit) id along with separate variables for street, city, postalcode, and state
-```{r prepare_addresses, eval=FALSE}
+```{r prepare_addresses}
 # Read in cleaned sample
-# We call and external Stata .do file (available on GitHub) for simplicity:
+# We call an external Stata .do file (available on GitHub) for simplicity:
 library(RStata)
 options("RStata.StataPath" = "/usr/local/stata19/stata-se") # Path to your Stata executable. Use console version instead of GUI (stata-se instead of xstata-se)
 suppressWarnings(stata(src = paste0(local_path, "data-raw/NCAddresses.do"), stata.version = 19.5))
@@ -130,4 +130,4 @@ example <- haven::read_dta(system.file("example_data", "sample_2022_addresses.dt
 print(head(example, n = 10))
 ```
 
-Please see the [Getting Started](getting-started.html) vignette and the function documentation for further guidance.
+Please see the [Getting Started](https://adam-p-shepardson.github.io/QOR/articles/getting-started.html) vignette and the function documentation for further guidance.

@@ -18,7 +18,7 @@
 #' @param units_per_batch Number of units to geocode in each batch (default: 4000). Internet connectivity and API limits determine possibility of larger (or smaller) batches.
 #' @param method Geocoding method to use (default: "census"). See methods from tidygeocoder::geocode(). We recommend "census" for best cost (free). You may need to adjust parts of code that set variable names if using different method.
 #' @param sleep_time Time to pause between batches (default: 2 seconds). Try increasing if you are getting rate-limited by the geocoding service or encountering connection issues.
-#' @param zip_id OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Output will have a postalcode column if provided, but this column will be NA if not provided.
+#' @param zip_id OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Output will have a postalcode column if provided, but this column will be NA if not provided. "Recover" will NOT be able to match any unmatched units if postalcode not provided here.
 #'
 #' @return A list with two items: (1) Tibble of matched units with their geocoded coordinates, and (2) Tibble of unmatched units (those that could not be geocoded).
 #'
