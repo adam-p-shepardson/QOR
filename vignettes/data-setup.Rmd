@@ -7,4 +7,127 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-# Data Setup
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Helpful Packages
+Most applications for the QOR method likely require data cleaning and manipulation of both typical data frames and spatial objects. The list of R packages below are likely to be helpful in these tasks, and are dependencies of the QOR package itself:
+```{r packages, eval=TRUE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(dplyr)
+library(haven)
+library(sf)
+library(QOR)
+
+# Not a package, but you would need your local path below to run the setup examples:
+#local_path <- "/path/to/your/QOR/directory/"  # Change this to your local path
+local_path <- "~/GitHub/Academic/QOR/" # example path
+```
+
+# Downloading Example Files
+
+In the provided example, we download zipped (.zip file) versions of: 
+- extracts: raw North Carolina voter registration data
+- zip_code: national zip code shapefiles from the U.S. Census Bureau
+- state_shape: North Carolina state boundary shapefile from the North Carolina Geospatial Data Clearinghouse
+- district_shapes: North Carolina school district shapefiles from the National Center for Education Statistics (NCES)
+
+We unzip these files for direct use in this tutorial. We also set the set a generous download timeout given that several files are quite large.
+
+```{r download}
+# Increase timeout for large files
+options(timeout = 1000)
+
+# Define URLs (example: North Carolina 2022 data)
+extracts <- "https://www.dropbox.com/scl/fi/ayb9s98b5tzr3hfo28baj/Example-Extracts.zip?rlkey=bq5pvd4i8y1mxvnmxnapo27bb&st=q4hg1lmv&dl=1"
+zip_codes <- "https://www.dropbox.com/scl/fi/sq0mudsvm1g7c9ljbiye1/ZIP_2022.zip?rlkey=v9gqxsx0b1dli7lnoi95qwlyv&st=p7lprz1m&dl=1"
+state_shape <- "https://www.dropbox.com/scl/fi/a8bn3ht1d67xd412zixf5/North_Carolina_State_Boundary.zip?rlkey=2j0at3vvts5i62trqvm4itpa5&st=0soqpq4j&dl=1"
+district_shapes <- "https://www.dropbox.com/scl/fi/eh557z55pg9051dq4mves/SCHOOL_SY2022.zip?rlkey=ds8a7pocgj7evgsmvhsn9dyow&st=tecyt8yc&dl=1"
+
+# Download voter registration extracts
+download.file(url = extracts,
+              destfile = "data-raw/Downloads/Extracts_2022.zip",
+              mode = "wb",
+              method = "auto")
+unzip(zipfile = "data-raw/Downloads/Extracts_2022.zip",
+      exdir = "data-raw/Extracted")
+
+# Download shapefiles
+download.file(url = zip_codes,
+              destfile = "data-raw/Downloads/zip_codes_2022.zip",
+              mode = "wb",
+              method = "auto")
+unzip(zipfile = "data-raw/Downloads/zip_codes_2022.zip",
+      exdir = "data-raw/Extracted")
+
+download.file(url = state_shape,
+              destfile = "data-raw/Downloads/state_shape.zip",
+              mode = "wb",
+              method = "auto")
+unzip(zipfile = "data-raw/Downloads/state_shape.zip",
+      exdir = "data-raw/Extracted")
+
+download.file(url = district_shapes,
+              destfile = "data-raw/Downloads/district_shapes_2022.zip",
+              mode = "wb",
+              method = "auto")
+unzip(zipfile = "data-raw/Downloads/district_shapes_2022.zip",
+      exdir = "data-raw/Extracted")
+```
+
+# Cleaning Addresses
+
+Before using QOR, it is imperative to ensure that your input data contain a minimal set of string address components:
+- street
+- city
+- state
+
+You may find that these components themselves must be built from other sub-components (e.g., street name, street number, apartment number, etc...) 
+Below, we create a random sample from the list of North Carolina voters.
+
+```{r cleaning}
+# Create random sample of voter data
+set.seed(5)
+sample <- read_dta("data-raw/Extracted/Example Extracts/VR_Snapshot_2022_ACTIVE.dta") %>%
+  bind_rows(., read_dta("data-raw/Extracted/Example Extracts/VR_Snapshot_2022_INACTIVETEMP.dta")) %>%
+  slice_sample(prop = .005)
+
+write_dta(sample, "data-raw/Extracted/sample_2022.dta")
+```
+
+Then, we can prepare addresses for geocoding. Our example was written in Stata and saved as a .dta file. However, address cleaning can occur in any programming language.
+
+**Example workflow:**
+
+- Rename address component variables to a standard format across the data years that you are using
+- Convert all address components/subcomponents to strings (e.g., string variables for street, city, postalcode, and state)
+- _Likely:_ construct the street address from subcomponents
+- Remove leading/trailing whitespace
+- _Optional:_ Construct full address string
+- Make sure to retain or generate a unique state voter (or other unit) id along with separate variables for street, city, postalcode, and state
+```{r prepare_addresses, eval=FALSE}
+# Read in cleaned sample
+# We call and external Stata .do file (available on GitHub) for simplicity:
+library(RStata)
+options("RStata.StataPath" = "/usr/local/stata19/stata-se") # Path to your Stata executable. Use console version instead of GUI (stata-se instead of xstata-se)
+suppressWarnings(stata(src = paste0(local_path, "data-raw/NCAddresses.do"), stata.version = 19.5))
+# Note: The above line requires the RStata package (install.packages("RStata")) and a local installation of Stata
+# If using GUI version (xstata-se), GTK warnings may appear but can be ignored if output is correct
+```
+
+# Next Steps
+Different raw data structures will require unique approaches to produce a format compatible with QOR functions. However, With cleaned addresses, you are now ready to geocode your data and apply the QOR method. 
+Your addresses should look similar to the following example input dataframe when correctly prepared for query():
+```{r example_addresses, eval=TRUE, message=FALSE, warning=FALSE}
+# Read the cleaned example addresses
+example <- haven::read_dta(system.file("example_data", "sample_2022_addresses.dta", package = "QOR"))
+# View a few cleaned addresses
+print(head(example, n = 10))
+```
+
+Please see the [Getting Started](getting-started.html) vignette and the function documentation for further guidance.
