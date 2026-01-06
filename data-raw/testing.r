@@ -1,18 +1,18 @@
 # Metadata ----
 # Authors: Adam Shepardson
 # Contact: apshepardson@albany.edu
-# Date Last Edited: 8/21/2025
+# Date Last Edited: 01/06/2026
 # Purpose: Test QOR package functions
 
 # Path
-local_path <- "C:/Users/adams/Documents/GitHub/QOR/"
+local_path <- "~/GitHub/Academic/QOR/"
 
 # Download necessary files for testing (too big to store on GitHub)
 source(paste0(local_path, "data-raw/download_data.r"))
 
 # Re-compile package and load QOR
-devtools::document("C:/Users/adams/Documents/GitHub/QOR")
-devtools::load_all("C:/Users/adams/Documents/GitHub/QOR")
+devtools::document("~/GitHub/Academic/QOR")
+devtools::load_all("~/GitHub/Academic/QOR")
 
 # Load testing data
 test <- haven::read_dta(system.file("example_data", "sample_2022_addresses.dta", package = "QOR"))
@@ -30,11 +30,15 @@ test_query <- query(units = test, unit_id = "statevoterid", street = "street", c
 matched <- test_query[[1]]
 unmatched <- test_query[[2]]
 
-# Overlay test
+# Overlay test: R
 test_overlay <- overlay(points = matched, polygons = district_shape, point_id = "statevoterid", 
 polygon_id = "GEOID", used_NCES = TRUE, state_FIPS = "37")
+
+# Overlay test: C++ (not yet done)
+test_overlay_cpp <- overlay(points = matched, polygons = district_shape, point_id = "statevoterid", 
+polygon_id = "GEOID", used_NCES = TRUE, state_FIPS = "37", use_cpp = TRUE)
 
 # Recover test
 test_recover <- recover(units = unmatched, polygons = district_shape, zipcodes = zip_shape,
  unit_id = "statevoterid", unit_zip = "postalcode", polygon_id = "GEOID", zip_id = "ZCTA5CE20",
- state_shape = state_shape, year = 2022, used_NCES = TRUE, state_FIPS = "37")
+ state_shape = state_shape, used_NCES = TRUE, state_FIPS = "37")

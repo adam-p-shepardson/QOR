@@ -50,16 +50,4 @@ Additional years of the preferred shapefiles can be obtained from the U.S. Censu
 
 Although QOR focuses on linking voters to specific school districts, it is also possible to substitute the addresses of some other entity of interest (e.g., specific schools, businesses, etc...) into the code. Similarly, rather than matching such entities to school districts, QOR can facilitate placing research subjects within the bounds of any shapefiles one has on hand (e.g., special administrative districts broadly-speaking). We recognize these potential external applications despite focusing our attention on a persistent voter identification problem in political research about school board elections.
 
-# A Note on Dependencies and Computing Environments
-We originally used a conda environment that installed R version 4.2.0 (most recent R version compatible with the cloud computing system of the lead author's university) and the required depencies simultaneously, with scripts run on Linux-based machines. Please note that, broadly speaking, many voter files are large and some cases, like multi-year panels, may require significant computing power. Evaluate the size of your data and the computing power available to you before running code. Academic audiences may not be aware that R generally manipulates objects through a copy-on-modify system that requires more memory than is often expected to manipulate large objects (see Ch. 2 of Wickham 2019). If you work with large datasets, you may need to increase the memory available to R. One (rough) rule of thumb is that you should have at least 2x the size of the object in memory to manipulate it.
-
-# Disclaimer
-When using data obtained from governments, please consult the laws of the specific government(s) in question to ensure compliance. It is important to understand that U.S. states differ widely in their laws regarding the use of voter registration data. Users are solely responsible for ensuring that their use of the data complies with all applicable laws and regulations. The authors of this package do not assume any liability for users' treatment of any data or their use of the package itself.
-
-# External Citations
-Cambon J., Hernangómez D., Belanger C., Possenriede D. (2021).
-  tidygeocoder: An R package for geocoding. Journal of Open Source
-  Software, 6(65), 3544, https://doi.org/10.21105/joss.03544 (R package
-  version 1.0.6)
-
-Wickham, H. (2019). Advanced R, Second Edition. Chapman & Hall/CRC. Accessed at https://adv-r.hadley.nz/
+For additional notes on dependencies, computing environments, disclaimers, and external citations, please see the [Extra Notes](articles/extra-notes.html) page.

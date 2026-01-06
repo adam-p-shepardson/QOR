@@ -1,0 +1,20 @@
+bibentry(
+  bibtype  = "Manual",
+  title    = "{QOR}: Functions to Identify 'Who Can Vote' in 'What School District'",
+  author   = c(
+    person("Adam", "Shepardson", email = "apshepardson@albany.edu", role = c("aut", "cre"), comment = c(ORCID = "0009-0004-1153-8014")),
+    person("Melissa", "Lyon", email = "mlyon@albany.edu", role = "ctb", comment = c(ORCID = "0000-0002-4388-6337")),
+    person("Beth", "Schueler", email = "bschu@stanford.edu", role = "ctb"),
+    person("Joshua", "Bleiberg", email = "jbleiber@pitt.edu", role = "ctb")
+  ),
+  year     = format(Sys.Date(), "%Y"),
+  note     = sprintf("R package version %s", meta$Version),
+  url      = "https://adam-p-shepardson.github.io/QOR",
+  textVersion = paste(
+    "Shepardson, A., Lyon, M., Schueler, B., & Bleiberg, J.",
+    sprintf("(%s).", format(Sys.Date(), "%Y")),
+    "QOR: Functions to Identify 'Who Can Vote' in 'What School District'",
+    sprintf("(Version %s) [Computer software].", meta$Version),
+    "https://adam-p-shepardson.github.io/QOR"
+  )
+)

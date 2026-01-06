@@ -1,0 +1,10 @@
+---
+title: "Data Setup"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Data Setup}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Data Setup

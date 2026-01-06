@@ -1,9 +1,11 @@
 Package: QOR
 Title: Functions to Identify "Who Can Vote" in "What School District"
-Version: 0.0.0.9000
+Version: 0.9.0.0
 Authors@R: c(
-    person("Adam", "Shepardson", , "apshepardson@albany.edu", role = c("aut", "cre"), comments = c(ORCID = "0009-0004-1153-8014")),
-    person("Melissa", "Lyon", , "mlyon@albany.edu", role = c("ctb"), comments = c(ORCID = "0000-0002-4388-6337")))
+    person("Adam", "Shepardson", , "apshepardson@albany.edu", role = c("aut", "cre"), comment = c(ORCID = "0009-0004-1153-8014")),
+    person("Melissa", "Lyon", , "mlyon@albany.edu", role = c("ctb"), comment = c(ORCID = "0000-0002-4388-6337")), 
+    person("Beth", "Schueler", , "bschu@stanford.edu", role = c("ctb")),
+    person("Joshua", "Bleiberg", , "jbleiber@pitt.edu", role = c("ctb")))
 Description: Matching point geometries (e.g., voter locations) to polygon geometries (e.g., school districts) 
     using spatial intersections and distances. The package implements the "Query, Overlay, Recover" (QOR) method from CITE, 
     which is a three-step process to identify which voters live in which school districts. QOR may be generalizable to
@@ -16,10 +18,17 @@ Imports:
     tidyverse,
     dplyr,
     tidygeocoder,
-    tictoc
+    tictoc,
+    Rcpp
 Suggests:
     patchwork,
     ggthemes,
-    haven
+    haven,
+    RStata,
+    knitr,
+    rmarkdown
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
+VignetteBuilder: knitr
+URL: https://adam-p-shepardson.github.io/QOR, https://github.com/adam-p-shepardson/QOR
+BugReports: https://github.com/adam-p-shepardson/QOR/issues

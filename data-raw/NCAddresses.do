@@ -1,14 +1,14 @@
 clear all
 
 // Set up path
-global path "C:/Users/adams/Documents/GitHub/QOR"
+global path "~/GitHub/Academic/QOR" // replace with your local path to the QOR repository
 
 cd "$path/"
 
 local y = 2022
 
 **Extract all NC addresses from the registered voters in 2022
-use "data-raw/Voter Extract Sample/sample_`y'.dta", clear
+use "data-raw/Extracted/sample_`y'.dta", clear
 
 * Make changes to facilitate geocoding
 // Rename to a logical geocoding format
