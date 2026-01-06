@@ -4,7 +4,7 @@ The QOR package contains functions for implementing the Query, Overlay, Recover 
 # Citation
 Please cite our work as follows:
 
-CURRENT CITATION
+Shepardson, A., Lyon, M., Schueler, B., & Bleiberg, J. (2026). QOR: Functions to Identify 'Who Can Vote' in 'What School District' (Version 0.9.0.0) [Computer software]. https://adam-p-shepardson.github.io/QOR
 
 # Query, Overlay, Recover
 QOR is a set of interwoven geospatial data management strategies which help address longstanding challenges in identifying "Who Votes" in school board elections. The process follows three simple steps:
@@ -50,4 +50,9 @@ Additional years of the preferred shapefiles can be obtained from the U.S. Censu
 
 Although QOR focuses on linking voters to specific school districts, it is also possible to substitute the addresses of some other entity of interest (e.g., specific schools, businesses, etc...) into the code. Similarly, rather than matching such entities to school districts, QOR can facilitate placing research subjects within the bounds of any shapefiles one has on hand (e.g., special administrative districts broadly-speaking). We recognize these potential external applications despite focusing our attention on a persistent voter identification problem in political research about school board elections.
 
-For additional notes on dependencies, computing environments, disclaimers, and external citations, please see the [Extra Notes](https://adam-p-shepardson.github.io/QOR/articles/extra-notes.html) page.
+# Tutorials
+Guidance on setting up raw data for use with QOR is available in the [Data Setup](data-setup.html) vignette.
+
+Similaly, we provide example code for using each of the three main functions in the [Getting Started](getting-started.html) vignette.
+
+For additional notes, external citations, and disclaimers, please see the [Extra Notes](extra-notes.html) page.
