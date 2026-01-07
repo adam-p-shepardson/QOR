@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 # Helpful Packages
 Most applications for the QOR method likely require data cleaning and manipulation of both typical data frames and spatial objects. The list of R packages below are likely to be helpful in these tasks, and are dependencies of the QOR package itself:
-```{r packages, eval=TRUE, message=FALSE, warning=FALSE}
+```{r packages}
 library(tidyverse)
 library(dplyr)
 library(haven)
@@ -49,35 +49,17 @@ zip_codes <- "https://www.dropbox.com/scl/fi/sq0mudsvm1g7c9ljbiye1/ZIP_2022.zip?
 state_shape <- "https://www.dropbox.com/scl/fi/a8bn3ht1d67xd412zixf5/North_Carolina_State_Boundary.zip?rlkey=2j0at3vvts5i62trqvm4itpa5&st=0soqpq4j&dl=1"
 district_shapes <- "https://www.dropbox.com/scl/fi/eh557z55pg9051dq4mves/SCHOOL_SY2022.zip?rlkey=ds8a7pocgj7evgsmvhsn9dyow&st=tecyt8yc&dl=1"
 
-# Download voter registration extracts
-download.file(url = extracts,
-              destfile = "data-raw/Downloads/Extracts_2022.zip",
-              mode = "wb",
-              method = "auto")
-unzip(zipfile = "data-raw/Downloads/Extracts_2022.zip",
-      exdir = "data-raw/Extracted")
+# Download voter registration extracts 
+download.file(url = extracts, destfile = paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), mode = "wb", method = "auto")
+unzip(zipfile = paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), exdir = paste0(local_path, "data-raw/Extracted"))
 
 # Download shapefiles
-download.file(url = zip_codes,
-              destfile = "data-raw/Downloads/zip_codes_2022.zip",
-              mode = "wb",
-              method = "auto")
-unzip(zipfile = "data-raw/Downloads/zip_codes_2022.zip",
-      exdir = "data-raw/Extracted")
-
-download.file(url = state_shape,
-              destfile = "data-raw/Downloads/state_shape.zip",
-              mode = "wb",
-              method = "auto")
-unzip(zipfile = "data-raw/Downloads/state_shape.zip",
-      exdir = "data-raw/Extracted")
-
-download.file(url = district_shapes,
-              destfile = "data-raw/Downloads/district_shapes_2022.zip",
-              mode = "wb",
-              method = "auto")
-unzip(zipfile = "data-raw/Downloads/district_shapes_2022.zip",
-      exdir = "data-raw/Extracted")
+download.file(url = zip_codes, destfile = paste0(local_path, "data-raw/Downloads/zip_codes_2022.zip"), mode = "wb", method = "auto")
+unzip(zipfile = paste0(local_path, "data-raw/Downloads/zip_codes_2022.zip"), exdir = paste0(local_path, "data-raw/Extracted"))
+download.file(url = state_shape, destfile = paste0(local_path, "data-raw/Downloads/state_shape.zip"), mode = "wb", method = "auto")
+unzip(zipfile = paste0(local_path, "data-raw/Downloads/state_shape.zip"), exdir = paste0(local_path, "data-raw/Extracted"))
+download.file(url = district_shapes, destfile = paste0(local_path, "data-raw/Downloads/district_shapes_2022.zip"), mode = "wb", method = "auto")
+unzip(zipfile = paste0(local_path, "data-raw/Downloads/district_shapes_2022.zip"), exdir = paste0(local_path, "data-raw/Extracted")) 
 ```
 
 # Cleaning Addresses
@@ -93,11 +75,11 @@ Below, we create a random sample from the list of North Carolina voters.
 ```{r cleaning}
 # Create random sample of voter data
 set.seed(5)
-sample <- read_dta("data-raw/Extracted/Example Extracts/VR_Snapshot_2022_ACTIVE.dta") %>%
-  bind_rows(., read_dta("data-raw/Extracted/Example Extracts/VR_Snapshot_2022_INACTIVETEMP.dta")) %>%
+sample <- read_dta(paste0(local_path, "data-raw/Extracted/Example Extracts/VR_Snapshot_2022_ACTIVE.dta")) %>%
+  bind_rows(., read_dta(paste0(local_path, "data-raw/Extracted/Example Extracts/VR_Snapshot_2022_INACTIVETEMP.dta"))) %>%
   slice_sample(prop = .005)
 
-write_dta(sample, "data-raw/Extracted/sample_2022.dta")
+write_dta(sample, paste0(local_path, "data-raw/Extracted/sample_2022.dta"))
 ```
 
 Then, we can prepare addresses for geocoding. Our example was written in Stata and saved as a .dta file. However, address cleaning can occur in any programming language.

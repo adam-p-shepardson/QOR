@@ -4,7 +4,7 @@ template:
 
 navbar:
   structure:
-    left: [intro, reference, data-setup, getting-started, extra-notes]
+    left: [intro, reference, data-setup, getting-started, state-fips, extra-notes]
     right: [search, github]
   components:
     data-setup:
@@ -13,6 +13,9 @@ navbar:
     getting-started:
       text: Getting Started
       href: articles/getting-started.html
+    state-fips:
+      text: State FIPS Codes
+      href: articles/state-fips.html
     extra-notes:
       text: Extra Notes
       href: articles/extra-notes.html

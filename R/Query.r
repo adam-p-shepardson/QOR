@@ -27,6 +27,7 @@
 #' @importFrom tictoc tic.clearlog tic toc
 #' @importFrom tidygeocoder geocode
 #' @importFrom sf st_as_sf st_crs st_transform st_make_valid st_filter read_sf
+#' @export
 query <- function(units = NULL, unit_id = "unit_id", street = "street", city = "city", state = "state", state_shape = NULL, 
 units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id = "postalcode") {
 

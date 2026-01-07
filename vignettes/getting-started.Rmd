@@ -7,6 +7,31 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r hidden_setup_start, include=FALSE, eval=TRUE}
+# Hidden code chunk for setting up my graphics
+local_path <- "~/GitHub/Academic/QOR/" # example path
+# Increase timeout for large files
+options(timeout = 1000)
+
+# Define URLs (example: North Carolina 2022 data)
+extracts <- "https://www.dropbox.com/scl/fi/ayb9s98b5tzr3hfo28baj/Example-Extracts.zip?rlkey=bq5pvd4i8y1mxvnmxnapo27bb&st=q4hg1lmv&dl=1"
+zip_codes <- "https://www.dropbox.com/scl/fi/sq0mudsvm1g7c9ljbiye1/ZIP_2022.zip?rlkey=v9gqxsx0b1dli7lnoi95qwlyv&st=p7lprz1m&dl=1"
+state_shape <- "https://www.dropbox.com/scl/fi/a8bn3ht1d67xd412zixf5/North_Carolina_State_Boundary.zip?rlkey=2j0at3vvts5i62trqvm4itpa5&st=0soqpq4j&dl=1"
+district_shapes <- "https://www.dropbox.com/scl/fi/eh557z55pg9051dq4mves/SCHOOL_SY2022.zip?rlkey=ds8a7pocgj7evgsmvhsn9dyow&st=tecyt8yc&dl=1"
+
+# Download voter registration extracts 
+download.file(url = extracts, destfile = paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), mode = "wb", method = "auto")
+unzip(zipfile = paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), exdir = paste0(local_path, "data-raw/Extracted"))
+
+# Download shapefiles
+download.file(url = zip_codes, destfile = paste0(local_path, "data-raw/Downloads/zip_codes_2022.zip"), mode = "wb", method = "auto")
+unzip(zipfile = paste0(local_path, "data-raw/Downloads/zip_codes_2022.zip"), exdir = paste0(local_path, "data-raw/Extracted"))
+download.file(url = state_shape, destfile = paste0(local_path, "data-raw/Downloads/state_shape.zip"), mode = "wb", method = "auto")
+unzip(zipfile = paste0(local_path, "data-raw/Downloads/state_shape.zip"), exdir = paste0(local_path, "data-raw/Extracted"))
+download.file(url = district_shapes, destfile = paste0(local_path, "data-raw/Downloads/district_shapes_2022.zip"), mode = "wb", method = "auto")
+unzip(zipfile = paste0(local_path, "data-raw/Downloads/district_shapes_2022.zip"), exdir = paste0(local_path, "data-raw/Extracted")) 
+```
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -19,18 +44,27 @@ The following brief tutorial demonstrates how to use the three main functions in
 
 # Load Package and Data
 
-```{r setup}
-# Load QOR
+```{r setup, eval=TRUE, message=FALSE, warning=FALSE}
+# You would need your local path below to run the setup examples:
+#local_path <- "/path/to/your/QOR/directory/"  # Change this to your local path
+local_path <- "~/GitHub/Academic/QOR/" # example path
+
+# Load packages for example
 library(QOR)
+library(tidyverse)
+library(sf)
 
 # Load example voter addresses
 example <- haven::read_dta(system.file("example_data", "sample_2022_addresses.dta", package = "QOR"))
 
 # Load shapefiles (see Data Setup vignette for download instructions)
-state_shape <- sf::read_sf(dsn = "data-raw/Extracted/North_Carolina_State_Boundary") %>%
-  dplyr::summarize(geometry = sf::st_union(geometry))
-zip_shape <- sf::read_sf(dsn = "data-raw/Extracted/ZIP_2022")
-district_shape <- read_sf(dsn = "data-raw/Extracted/SCHOOL_SY2022")
+state_shape <- read_sf(dsn = paste0(local_path, "data-raw/Extracted/North_Carolina_State_Boundary")) %>%
+  dplyr::summarize(geometry = st_union(geometry)) %>%
+  st_make_valid()
+zip_shape <- read_sf(dsn = paste0(local_path, "data-raw/Extracted/ZIP_2022")) %>%
+  st_make_valid()
+district_shape <- read_sf(dsn = paste0(local_path, "data-raw/Extracted/SCHOOL_SY2022")) %>%
+  st_make_valid()
 ```
 
 # Query: Geocode Addresses
@@ -57,11 +91,30 @@ unmatched <- test_query[[2]]  # Failed to geocode (use for Recover)
 
 We can demonstrate that the geocoding worked by plotting the matched points against the state boundary and district shapes:
 ```{r query_plot, eval=TRUE, message=FALSE, warning=FALSE}
+# Packages for plotting
+library(ggplot2)
+library(ggthemes)
 
+# Filter down to just NC districts
+district_shape_temp <- district_shape %>% filter(STATEFP == 37) # NC is FIPS 37
 
+# Plot geocoded points
+plot <- ggplot() +
+    geom_sf(data = state_shape, alpha = 0) +
+    geom_sf(data = matched, pch = "*", size = 3, alpha = 0.2, aes(color = "Geocoded Voters")) +
+    geom_sf(data = district_shape_temp, alpha = 0.1, color = "darkmagenta", size = 0.5, aes(fill = "School Districts")) +
+    scale_color_manual(values = "black") +
+    scale_fill_manual(values = "white") +
+    labs(title = paste0(as.character(2022), " Small Sample of Geocoded Voters in North Carolina"),
+         caption = "Notes: \nWhere district files are sourced from the U.S. Census Bureau \nand voter information is sourced from the State of North Carolina. \nGraph reflects successful geocoding matches from sample.",
+         fill = "", color = "") +
+    ggthemes::theme_map() +
+    theme(legend.position = "bottom", legend.direction = "horizontal", plot.caption = element_text(hjust = 0),
+          panel.background = element_rect(fill = "white", color = "white"), plot.background = element_rect(fill = "white", color = "white"))
 
+rm(district_shape_temp)
 
-
+print(plot) # display map
 
 ```
 
@@ -102,10 +155,149 @@ test_recover <- recover(
 # Why Does This Work?
 QOR leverages the fact that voters, school districts, and zip codes are all spatial entities convertable to the same coordinate reference system (CRS). 
 
-The visualization below shows, conceptually, how geocoded voter points (from `query()`) can be overlaid onto school district polygons (from `overlay()`) to identify which voters live in which districts. For unmatched voters, QOR uses zip code polygons (from `recover()`) as an intermediary spatial unit to help assign voters to districts based on proximity.
+The visualization below shows, conceptually, the three different layers. Geocoded voter points (from `query()`) can be overlaid onto school district polygons (from `overlay()`) to identify which voters live in which districts. For unmatched voters, QOR uses zip code polygons (from `recover()`) as an intermediary spatial unit to help assign voters to districts based on proximity.
 
-```{r why_it_works, eval=TRUE, message=FALSE, warning=FALSE}
+```{r why_it_works, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE}
 
+# Package for a 3D plot
+library(rgl)
 
+# Zip changes
+zip_shape <- zip_shape %>%
+  rename(., postalcode = ZCTA5CE20)
 
+# Generate random dots to represent possible voter locations
+set.seed(1)
+voters <- st_sample(state_shape, size = 1000, type = "random")
+voters <- st_sf(geometry = voters)
+
+# Equalize coordinate systems
+NC_map <- st_transform(state_shape, crs = st_crs(district_shape))
+voters <- st_transform(voters, crs = st_crs(district_shape))
+zip_shape <- st_transform(zip_shape, crs = st_crs(district_shape))
+
+# Filter down to just NC districts and zipcodes
+district_shape_temp <- district_shape %>% filter(STATEFP == 37) # NC is FIPS 37. See: https://www2.census.gov/geo/docs/reference/codes2020/national_state2020.txt
+zip_shape <- zip_shape %>%
+  st_filter(., NC_map)
+
+## 3D Plot showing layers
+# store Z offsets
+z_offsets <- c(0, 2, 4, 6)
+
+# Add a default 3rd dimension to the needed shapefiles
+zipcode_shape3d <- st_zm(zip_shape, drop = FALSE, what = "Z")
+zipcode_shape3d <- st_sf(geometry = zipcode_shape3d)
+
+districts_shape3d <- st_zm(district_shape_temp, drop = FALSE, what = "Z")
+districts_shape3d <- st_sf(geometry = districts_shape3d)
+
+voters3d <- st_zm(voters, drop = FALSE, what = "Z")
+voters3d <- st_sf(geometry = voters3d)
+
+# store 3D shapefiles in list
+shapefiles <- list(zipcode_shape3d, districts_shape3d, voters3d)
+
+# put colors in a vector
+colors <- c("darkgreen", "darkred", "navyblue")
+
+# Put labels for shapefile layers in a vector
+labels <- c("Zip Code Layer", "School District Layer", "Voter Layer")
+
+create_3d_plot <- function(shapefiles, z_offsets, colors, labels, angle_x = 45, angle_y = 30, zoom = .7) {
+  
+  open3d()  # Open a new 3D device using rgl package
+  
+  # Loop through shapefiles and plot each layer
+  for (i in seq_along(shapefiles)) {
+    shapefile <- shapefiles[[i]]
+    z_offset <- z_offsets[i]
+    color <- colors[i]
+    
+    # Get geometry type for the shapefile
+    geom_type <- unique(st_geometry_type(shapefile))
+    
+    # Handle polygons
+    if (any(geom_type %in% c("POLYGON", "MULTIPOLYGON"))) {
+      for (j in seq_len(nrow(shapefile))) {
+        polygon <- st_geometry(shapefile[j, ])
+        coords <- st_coordinates(polygon)
+        coords[, "Z"] <- z_offset  # Uniform Z-offset
+        
+        # Plot each ring separately
+        unique_rings <- unique(coords[, "L1"])
+        for (ring in unique_rings) {
+          ring_coords <- coords[coords[, "L1"] == ring, ]
+          lines3d(ring_coords[, 1], ring_coords[, 2], ring_coords[, 3], col = color, lwd = 2)
+        }
+      }
+    }
+    
+    # Handle points
+    if (any(geom_type == "POINT")) {
+      coords <- st_coordinates(shapefile)
+      coords[, "Z"] <- coords[, "Z"] + z_offset  # Adjust existing 0 Z-values
+      points3d(coords[, 1], coords[, 2], coords[, 3], col = color, alpha = 0.6, size = 3)
+    }
+  }
+  
+  # Add a 2D box on the base layer (Z = 0)
+  bbox <- st_bbox(do.call(c, lapply(shapefiles, st_geometry)))
+  box_coords <- rbind(
+    c(bbox["xmin"], bbox["ymin"], 0),
+    c(bbox["xmax"], bbox["ymin"], 0),
+    c(bbox["xmax"], bbox["ymax"], 0),
+    c(bbox["xmin"], bbox["ymax"], 0),
+    c(bbox["xmin"], bbox["ymin"], 0)
+  )
+  
+  # Adjust view
+  rgl.viewpoint(theta = angle_x, phi = angle_y, zoom = zoom)
+  
+  # Add title
+  text3d(x = mean(c(bbox["xmin"], bbox["xmax"]) - 1), 
+         y = bbox["ymax"] + 1.5,  # Adjust position above plot
+         z = min(z_offsets), 
+         texts = "Three Step QOR Process", 
+         cex = 2.5, 
+         adj = c(0.5, 0.5),
+         font = 2)
+  
+  # Add legend
+  add_legend <- function(labels, colors, x = -1, y = 2, z = 2, spacing = 2) {
+    n <- length(labels)
+    for (i in seq_along(labels)) {
+      points3d(x, y - i * spacing, z, col = colors[i], size = 10)
+      text3d(x + 0.2, y - i * spacing, z, labels[i], adj = c(0, 0.5), cex = 1.5)
+    }
+  }
+  add_legend(labels, colors, x = bbox["xmax"] - 7.9, y = bbox["ymax"] - 7.4, z = 2, spacing = 1)
+  
+  # Ensure no axis labels
+  title3d(xlab = "", ylab = "", zlab = "")
+  
+}
+
+create_3d_plot(shapefiles, z_offsets, colors, labels)
+
+# Set the size of the 3D plot window
+rgl::par3d(windowRect = c(0, 0, 1920, 1080))  # 1920x1080 resolution
+
+# Capture the 3D plot for HTML output
+rglwidget()
+```
+
+```{r hidden_setup_end, include=FALSE, eval=TRUE}
+# Hidden code chunk for deleting downloaded files after use
+# Zipped files
+files_to_delete <- c(paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), paste0(local_path, "data-raw/Downloads/zip_codes_2022.zip"), 
+paste0(local_path, "data-raw/Downloads/state_shape.zip"), paste0(local_path, "data-raw/Downloads/district_shapes_2022.zip"))
+file.remove(files_to_delete)
+
+# Extracted files
+names <- c("Example Extracts", "ZIP_2022", "North_Carolina_State_Boundary", "SCHOOL_SY2022")
+for (name in names) {
+  to_delete <- list.files(paste0(local_path, "data-raw/Extracted/", name), full.names = TRUE)
+  file.remove(to_delete)
+}
 ```
