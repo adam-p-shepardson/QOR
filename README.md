@@ -33,6 +33,7 @@ To install the QOR package, use the following code in R:
 ```R 
  devtools::install_github("adam-p-shepardson/QOR")
 ```
+Please note that installing the "sf" dependency is difficult on MacOS and you may need to follow further instructions here: https://github.com/r-spatial/sf 
 
 # Minimal Data Requirements
 QOR requires voter postal addresses, school district shapefiles, zipcode shapefiles, and a state boundary shapefile, with any time-varying shapes ideally obtained on a yearly basis. These undemanding data requirements can also accommodate paid voter files (including popular products from vendors L2 and Catalist) provided these products contain registration address information. We have set up several years of the [NCES school district shapefiles](https://www.dropbox.com/scl/fo/cq8l368nr0lfuq663g6id/AJarAbqc0PS9RAD_vbZ9ZpM?rlkey=4gviqpiehyufriffkue8371ga&st=twam8we4&dl=0) and [Census TIGER/LINE zipcode shapefiles](https://www.dropbox.com/scl/fo/nkvfbrzxe4lvlhowmy6j6/ACOSb9wP8kEjkEPIXC4XZSg?rlkey=zfp9wy70vehfil2reu7youbxn&st=dxnfczu0&dl=0) for use with QOR in Dropbox folders tied to this project. Note that it is difficult to download unzipped folders from Dropbox directly in R, and downloading the .zip file versions we have provided is much easier. 
