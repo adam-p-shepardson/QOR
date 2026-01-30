@@ -24,8 +24,12 @@ When using data obtained from governments, please consult the laws of the specif
 Text throughout this website cites the following external references:
 
 Cambon J., Hernangómez D., Belanger C., & Possenriede D. (2021).
-  tidygeocoder: An R package for geocoding. Journal of Open Source
-  Software, 6(65), 3544, https://doi.org/10.21105/joss.03544 (R package
+  tidygeocoder: An R package for geocoding. _Journal of Open Source
+  Software, 6_(65), 3544, https://doi.org/10.21105/joss.03544 (R package
   version 1.0.6)
 
-Wickham, H. (2019). Advanced R, Second Edition. Chapman & Hall/CRC. Accessed at https://adv-r.hadley.nz/
+Pebesma, E., & Bivand, R. (2023). _Spatial Data Science: With applications in R_. 
+  Chapman and Hall/CRC. doi:10.1201/9780429459016, https://r-spatial.org/book/. 
+
+Wickham, H. (2019). _Advanced R, Second Edition_. Chapman & Hall/CRC. 
+  Accessed at https://adv-r.hadley.nz/

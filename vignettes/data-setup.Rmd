@@ -35,11 +35,12 @@ local_path <- "~/GitHub/Academic/QOR/" # example path
 
 In the provided example, we download zipped (.zip file) versions of: 
 
+- extracts: Small (~0.05%) anonymized voter registration extract sample for North Carolina in 2022
 - zip_code: National zip code shapefiles from the U.S. Census Bureau
 - state_shape: North Carolina state boundary shapefile from the North Carolina Geospatial Data Clearinghouse
 - district_shapes: North Carolina school district shapefiles from the National Center for Education Statistics (NCES)
 
-We unzip these files for direct use in this tutorial. We also set the set a generous download timeout given that several files are quite large.
+We unzip these files for direct use in this tutorial. We also set a generous download timeout given that several files are quite large.
 
 Users should note that a small, anonymized random sample of North Carolina voter registration data is included in the QOR package for demonstration purposes. This sample data is used in the address cleaning example below. For real applications, however, users will need to obtain their own voter registration data from a relevant governmental unit (or a paid provider).
 
@@ -72,7 +73,7 @@ Before using QOR, it is imperative to ensure that your input data contain a mini
 
 You may find that these components themselves must be built from other sub-components (e.g., street name, street number, apartment number, etc...). Below, we read-in our small random sample of anonymous voters before address processing:
 
-```{r cleaning}
+```{r cleaning, eval=TRUE, message=FALSE, warning=FALSE}
 # Download anonymized voter registration extracts (Taken Jan. 1, 2022)
 download.file(url = extracts, destfile = paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), mode = "wb", method = "auto")
 unzip(zipfile = paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), exdir = paste0(local_path, "data-raw/Extracted"))
@@ -86,7 +87,7 @@ Then, we can prepare addresses for geocoding. Our example was written in Stata a
 
 **Example workflow:**
 
-- Read in raw data
+- Load raw data
 - Rename address component variables to a standard format across the data years that you are using
 - Convert all address components/subcomponents to strings (e.g., string variables for street, city, postalcode, and state)
 - _Likely Needed:_ Construct the street address from subcomponents
