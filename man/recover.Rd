@@ -18,7 +18,7 @@ recover(
 )
 }
 \arguments{
-\item{units}{Dataframe or tibble containing unit information (must have unique ID and a zipcode variable).}
+\item{units}{Dataframe or tibble containing unit information (must have unique unit_id and a zipcode variable).}
 
 \item{polygons}{sf object containing polygon geometries (e.g., school districts).}
 

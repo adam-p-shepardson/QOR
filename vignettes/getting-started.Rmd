@@ -14,14 +14,9 @@ local_path <- "~/GitHub/Academic/QOR/" # example path
 options(timeout = 1000)
 
 # Define URLs (example: North Carolina 2022 data)
-extracts <- "https://www.dropbox.com/scl/fi/ayb9s98b5tzr3hfo28baj/Example-Extracts.zip?rlkey=bq5pvd4i8y1mxvnmxnapo27bb&st=q4hg1lmv&dl=1"
 zip_codes <- "https://www.dropbox.com/scl/fi/sq0mudsvm1g7c9ljbiye1/ZIP_2022.zip?rlkey=v9gqxsx0b1dli7lnoi95qwlyv&st=p7lprz1m&dl=1"
 state_shape <- "https://www.dropbox.com/scl/fi/a8bn3ht1d67xd412zixf5/North_Carolina_State_Boundary.zip?rlkey=2j0at3vvts5i62trqvm4itpa5&st=0soqpq4j&dl=1"
 district_shapes <- "https://www.dropbox.com/scl/fi/eh557z55pg9051dq4mves/SCHOOL_SY2022.zip?rlkey=ds8a7pocgj7evgsmvhsn9dyow&st=tecyt8yc&dl=1"
-
-# Download voter registration extracts 
-download.file(url = extracts, destfile = paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), mode = "wb", method = "auto")
-unzip(zipfile = paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), exdir = paste0(local_path, "data-raw/Extracted"))
 
 # Download shapefiles
 download.file(url = zip_codes, destfile = paste0(local_path, "data-raw/Downloads/zip_codes_2022.zip"), mode = "wb", method = "auto")
@@ -68,6 +63,7 @@ district_shape <- read_sf(dsn = paste0(local_path, "data-raw/Extracted/SCHOOL_SY
 ```
 
 # Query: Geocode Addresses
+
 The first step is to geocode unit addresses using the `query()` function. This function takes a data frame of addresses and returns two data frames: one with successfully geocoded points and another with addresses that could not be geocoded.
 
 ```{r query, eval=TRUE, message=FALSE, warning=FALSE}
@@ -90,6 +86,7 @@ unmatched <- test_query[[2]]  # Failed to geocode (use for Recover)
 ```
 
 We can demonstrate that the geocoding worked by plotting the matched points against the state boundary and district shapes:
+
 ```{r query_plot, eval=TRUE, message=FALSE, warning=FALSE}
 # Packages for plotting
 library(ggplot2)
@@ -120,6 +117,7 @@ print(plot) # display map
 
 
 # Overlay: Match Voters to Districts
+
 The second step is to overlay the geocoded points onto the district shapefiles using the `overlay()` function. This function assigns each geocoded point to a polygon (school district) based on spatial location.
 
 ```{r overlay}
@@ -134,6 +132,7 @@ test_overlay <- overlay(
 ```
 
 # Recover: Assign Unmatched Voters
+
 The final step is to recover the unmatched units using the `recover()` function. This function uses zip code information and spatial distances between zip code and polygon centers to assign unmatched units to polygons.
 
 ```{r recover}
@@ -153,6 +152,7 @@ test_recover <- recover(
 
 
 # Why Does This Work?
+
 QOR leverages the fact that voters, school districts, and zip codes are all spatial entities convertable to the same coordinate reference system (CRS). 
 
 The visualization below shows, conceptually, the three different layers. Geocoded voter points (from `query()`) can be overlaid onto school district polygons (from `overlay()`) to identify which voters live in which districts. For unmatched voters, QOR uses zip code polygons (from `recover()`) as an intermediary spatial unit to help assign voters to districts based on proximity.
@@ -290,12 +290,12 @@ rglwidget()
 ```{r hidden_setup_end, include=FALSE, eval=TRUE}
 # Hidden code chunk for deleting downloaded files after use
 # Zipped files
-files_to_delete <- c(paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), paste0(local_path, "data-raw/Downloads/zip_codes_2022.zip"), 
+files_to_delete <- c(paste0(local_path, "data-raw/Downloads/zip_codes_2022.zip"), 
 paste0(local_path, "data-raw/Downloads/state_shape.zip"), paste0(local_path, "data-raw/Downloads/district_shapes_2022.zip"))
 file.remove(files_to_delete)
 
 # Extracted files
-names <- c("Example Extracts", "ZIP_2022", "North_Carolina_State_Boundary", "SCHOOL_SY2022")
+names <- c("ZIP_2022", "North_Carolina_State_Boundary", "SCHOOL_SY2022")
 for (name in names) {
   to_delete <- list.files(paste0(local_path, "data-raw/Extracted/", name), full.names = TRUE)
   file.remove(to_delete)

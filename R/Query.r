@@ -8,17 +8,17 @@
 #' - **Note:** This function does not perform any matching to polygons or zip codes; it simply geocodes the addresses.
 #' - Allows you to choose any geocoding service available in the `tidygeocoder` package (we recommend using the "census" method for best results).
 #'
-#' @param units Dataframe or tibble containing voter information (must have unique ID, street, city, and state columns).
+#' @param units Dataframe or tibble containing voter information (must have unique unit_id, street, city, and state columns).
 #' @param unit_id Name of the column in the units dataframe that contains the unique identifiers for each unit (default: "unit_id").
 #' @param street Name of the column in the units dataframe that contains the street address (default: "street").
 #' @param city Name of the column in the units dataframe that contains the city (default: "city").
 #' @param state Name of the column in the units dataframe that contains the state (default: "state").
 #' @param state_shape sf object containing the shape of the state (used to filter geocoding results to the state, catching errors).
-#' @param year Year of the data (default: NULL, which throws an error). Program was designed for years 2007 through 2023. Years < 2007 will use the 2010 Census database, and years > 2023 will use the 2023 ACS database.
-#' @param units_per_batch Number of units to geocode in each batch (default: 4000). Internet connectivity and API limits determine possibility of larger (or smaller) batches.
-#' @param method Geocoding method to use (default: "census"). See methods from tidygeocoder::geocode(). We recommend "census" for best cost (free). You may need to adjust parts of code that set variable names if using different method.
+#' @param year Year of the data (default: NULL, which throws an error). Program was designed for years 2007 through 2025. Years <= 2010 will use the 2010 Census database, and years > 2025 will use the current Census database.
+#' @param units_per_batch Number of units to geocode in each batch (default: 4000). Internet connectivity and API limits determine possibility of larger (or smaller) batches. The Census theoretically allows batches of up to 10,000 addresses, but we have found that smaller batches are less likely to be rejected by the API.
+#' @param method Geocoding method to use (default: "census"). See methods from tidygeocoder::geocode(). We recommend "census" for best cost (free) and batch geocoding. You may need to adjust parts of code that set variable names if using different method, and not all methods may support the batch coding that we use by default.
 #' @param sleep_time Time to pause between batches (default: 2 seconds). Try increasing if you are getting rate-limited by the geocoding service or encountering connection issues.
-#' @param zip_id OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Output will have a postalcode column if provided, but this column will be NA if not provided. "Recover" will NOT be able to match any unmatched units if postalcode not provided here.
+#' @param zip_id RECOMMENDED BUT OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Output will have a postalcode column if provided, but this column will be NA if not provided. "Recover" will NOT be able to match any unmatched units if postalcode not provided here.
 #'
 #' @return A list with two items: (1) Tibble of matched units with their geocoded coordinates, and (2) Tibble of unmatched units (those that could not be geocoded).
 #'
@@ -77,12 +77,12 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id =
     split <- rep(1:unitgroups, ceiling(nrow(units) / unitgroups)) # repeat 1 through # unitgroups the desired # of times
     split <- split[1:nrow(units)] # Since I round the group number, need to chop off some of the extra integers to match length of units
     units <- units %>%
-        dplyr::mutate(., split = split) # Each obs. is now flagged to be put into a sample group
+        dplyr::mutate(., s_2_1_1_1_1 = split) # Each obs. is now flagged to be put into a sample group
   
     # create sample groups, store in list
     sample_list <- list()
     for(num in 1:unitgroups) {
-        sample <- units %>% dplyr::filter(., .data$split == num)
+        sample <- units %>% dplyr::filter(., .data$s_2_1_1_1_1 == num)
         sample_list[[num]] <- sample
         rm(sample)
     }
@@ -102,8 +102,14 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id =
         vin <- "ACS2021_Current"
     } else if(yr == 2022) {
         vin <- "ACS2022_Current"
-    } else if(yr >= 2023) {
+    } else if(yr == 2023) {
         vin <- "ACS2023_Current"
+    } else if(yr == 2024) {
+        vin <- "ACS2024_Current"
+    } else if(yr == 2025) {
+        vin <- "ACS2025_Current"
+    } else {
+        vin <- "Current_Current"
     }
 
     ## Loop through the samples, referencing the Census TIGER database for address coordinates
@@ -220,7 +226,16 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id =
     } else { # Do not need to append if nothing in "not_instate"
         still_unmatched <- still_unmatched
     }
-  
+
+    # Retain only relevant columns
+    if(!is.null(zip_id) && zip_id %in% names(units)) { 
+        coord <- coord[, c("unit_id", "str", "cty", "ste", "postalcode", "geometry")]
+        still_unmatched <- still_unmatched[, c("unit_id", "str", "cty", "ste", "postalcode")]
+    } else {
+        coord <- coord[, c("unit_id", "str", "cty", "ste", "geometry")]
+        still_unmatched <- still_unmatched[, c("unit_id", "str", "cty", "ste")]
+    }
+
     # Recover user-defined column names
     colnames(coord)[colnames(coord) == "unit_id"] <- unit_id
     colnames(coord)[colnames(coord) == "str"] <- street

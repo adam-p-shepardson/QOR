@@ -1,7 +1,7 @@
 # Metadata ----
 # Authors: Adam Shepardson
 # Contact: apshepardson@albany.edu
-# Date Last Edited: 01/06/2026
+# Date Last Edited: 01/30/2026
 # Purpose: Test QOR package functions
 
 # Path
@@ -13,6 +13,9 @@ source(paste0(local_path, "data-raw/download_data.r"))
 # Re-compile package and load QOR
 devtools::document("~/GitHub/Academic/QOR")
 devtools::load_all("~/GitHub/Academic/QOR")
+
+# Re-compile github website
+pkgdown::build_site("~/GitHub/Academic/QOR")
 
 # Load testing data
 test <- haven::read_dta(system.file("example_data", "sample_2022_addresses.dta", package = "QOR"))
@@ -30,13 +33,9 @@ test_query <- query(units = test, unit_id = "statevoterid", street = "street", c
 matched <- test_query[[1]]
 unmatched <- test_query[[2]]
 
-# Overlay test: R
+# Overlay test
 test_overlay <- overlay(points = matched, polygons = district_shape, point_id = "statevoterid", 
 polygon_id = "GEOID", used_NCES = TRUE, state_FIPS = "37")
-
-# Overlay test: C++ (not yet done)
-test_overlay_cpp <- overlay(points = matched, polygons = district_shape, point_id = "statevoterid", 
-polygon_id = "GEOID", used_NCES = TRUE, state_FIPS = "37", use_cpp = TRUE)
 
 # Recover test
 test_recover <- recover(units = unmatched, polygons = district_shape, zipcodes = zip_shape,

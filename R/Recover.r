@@ -10,7 +10,7 @@
 #' - Intended for cases where the "Query" operation fails to convert an address to a point geometry.
 #' - To return multiple polygons per unit, you will need to modify the code.
 #'
-#' @param units Dataframe or tibble containing unit information (must have unique ID and a zipcode variable).
+#' @param units Dataframe or tibble containing unit information (must have unique unit_id and a zipcode variable).
 #' @param polygons sf object containing polygon geometries (e.g., school districts).
 #' @param zipcodes sf object containing zipcode tabulation area geometries (ZCTAs).
 #' @param unit_id Name of the column in the units dataframe that contains unique identifiers for each unit (default: "unit_id").

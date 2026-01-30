@@ -1,5 +1,5 @@
 Package: QOR
-Title: Functions to Identify "Who Can Vote" in "What School District"
+Title: Functions to Identify Who Can Vote in What School District
 Version: 0.9.0.0
 Authors@R: c(
     person("Adam", "Shepardson", , "apshepardson@albany.edu", role = c("aut", "cre"), comment = c(ORCID = "0009-0004-1153-8014")),
@@ -18,8 +18,7 @@ Imports:
     tidyverse,
     dplyr,
     tidygeocoder,
-    tictoc,
-    Rcpp
+    tictoc
 Suggests:
     patchwork,
     ggthemes,

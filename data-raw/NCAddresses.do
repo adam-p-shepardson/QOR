@@ -8,7 +8,7 @@ cd "$path/"
 local y = 2022
 
 **Extract all NC addresses from the registered voters in 2022
-use "data-raw/Extracted/sample_`y'.dta", clear
+use "data-raw/Extracted/Example Extracts/VR_Snapshot_2022_ALL_Anonymized.dta", clear
 
 * Make changes to facilitate geocoding
 // Rename to a logical geocoding format
@@ -59,12 +59,7 @@ replace regunitnum = strtrim(regunitnum)
 replace regcity = strtrim(regcity)
 replace regstate = strtrim(regstate)
 replace regzipcode = strtrim(regzipcode)
-// Generate full_address from component strings
-gen full_address = ""
-replace full_address = regstnum + " " + regstfrac + " " + regstpredirection + " " + regstname + " " + regsttype + " " + regstpostdirection + " " + regunittype + " " + regunitnum + ", " + regcity + ", " + regstate + " " + regzipcode 
-//gen full_address = ""
-//replace full_address = regstnum + " " + regstfrac + " " + regstpredirection + " " + regstname + " " + regsttype + " " + regstpostdirection + ", " + regcity + ", " + regstate
-replace full_address = strtrim(full_address)
+
 // Generate simple components for address variables
 gen street = ""
 replace street = regstnum + " " + regstfrac + " " + regstpredirection + " " + regstname + " " + regsttype + " " + regstpostdirection + " " + regunittype + " " + regunitnum 
@@ -75,7 +70,7 @@ gen city = regcity
 gen state = regstate
 gen postalcode = regzipcode
 // keep only the variables that I want
-keep statevoterid full_address street city state postalcode
+keep statevoterid street city state postalcode
 
 // Write cleaned address dataset
 save "inst/example_data/sample_`y'_addresses.dta", replace

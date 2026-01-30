@@ -37,7 +37,7 @@ This function:
 \itemize{
 \item Matches point geometries (e.g., voter locations) to polygon geometries (e.g., school districts) using spatial intersections and distances.
 \item Requires that all points and polygons each have a unique identifier column.
-\item If observations are not unique (e.g., panel data), use only one timepoint per function call (e.g., all voters in one year, then all voters in the next year, etc.).
+\item If observations are not unique (e.g., panel data), use only one timepoint per function call (e.g., all voters in one year, then all voters in the next year, etc...).
 \item Returns a match that assigns \strong{one} polygon to each point: the polygon the point is in, or the closest polygon (based on internal point) if the point is not in any polygon.
 \item To return multiple polygons per point, you will need to modify the code.
 }

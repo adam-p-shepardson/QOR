@@ -19,7 +19,7 @@ query(
 )
 }
 \arguments{
-\item{units}{Dataframe or tibble containing voter information (must have unique ID, street, city, and state columns).}
+\item{units}{Dataframe or tibble containing voter information (must have unique unit_id, street, city, and state columns).}
 
 \item{unit_id}{Name of the column in the units dataframe that contains the unique identifiers for each unit (default: "unit_id").}
 
@@ -31,15 +31,15 @@ query(
 
 \item{state_shape}{sf object containing the shape of the state (used to filter geocoding results to the state, catching errors).}
 
-\item{units_per_batch}{Number of units to geocode in each batch (default: 4000). Internet connectivity and API limits determine possibility of larger (or smaller) batches.}
+\item{units_per_batch}{Number of units to geocode in each batch (default: 4000). Internet connectivity and API limits determine possibility of larger (or smaller) batches. The Census theoretically allows batches of up to 10,000 addresses, but we have found that smaller batches are less likely to be rejected by the API.}
 
-\item{year}{Year of the data (default: NULL, which throws an error). Program was designed for years 2007 through 2023. Years < 2007 will use the 2010 Census database, and years > 2023 will use the 2023 ACS database.}
+\item{year}{Year of the data (default: NULL, which throws an error). Program was designed for years 2007 through 2025. Years <= 2010 will use the 2010 Census database, and years > 2025 will use the current Census database.}
 
-\item{method}{Geocoding method to use (default: "census"). See methods from tidygeocoder::geocode(). We recommend "census" for best cost (free). You may need to adjust parts of code that set variable names if using different method.}
+\item{method}{Geocoding method to use (default: "census"). See methods from tidygeocoder::geocode(). We recommend "census" for best cost (free) and batch geocoding. You may need to adjust parts of code that set variable names if using different method, and not all methods may support the batch coding that we use by default.}
 
 \item{sleep_time}{Time to pause between batches (default: 2 seconds). Try increasing if you are getting rate-limited by the geocoding service or encountering connection issues.}
 
-\item{zip_id}{OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Output will have a postalcode column if provided, but this column will be NA if not provided. "Recover" will NOT be able to match any unmatched units if postalcode not provided here.}
+\item{zip_id}{RECOMMENDED BUT OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Output will have a postalcode column if provided, but this column will be NA if not provided. "Recover" will NOT be able to match any unmatched units if postalcode not provided here.}
 }
 \value{
 A list with two items: (1) Tibble of matched units with their geocoded coordinates, and (2) Tibble of unmatched units (those that could not be geocoded).
