@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 Most applications for the QOR method likely require data cleaning and manipulation of both typical data frames and spatial objects. The list of R packages below are likely to be helpful in these tasks, and are dependencies of the QOR package itself:
 
-```{r packages}
+```{r packages, eval=TRUE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(dplyr)
 library(haven)
