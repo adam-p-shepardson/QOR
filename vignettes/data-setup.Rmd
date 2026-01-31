@@ -35,14 +35,14 @@ local_path <- "~/GitHub/Academic/QOR/" # example path
 
 In the provided example, we download zipped (.zip file) versions of: 
 
-- extracts: Small (~0.05%) anonymized voter registration extract sample for North Carolina in 2022
-- zip_code: National zip code shapefiles from the U.S. Census Bureau
-- state_shape: North Carolina state boundary shapefile from the North Carolina Geospatial Data Clearinghouse
-- district_shapes: North Carolina school district shapefiles from the National Center for Education Statistics (NCES)
+- extracts: Anonymized 2022 voter registration extract sample (~0.05%) for North Carolina
+- zip_codes: National zip code shapefiles from the U.S. Census Bureau
+- state_shape: State boundary shapefile from the North Carolina Geospatial Data Clearinghouse
+- district_shapes: National school district shapefiles from the National Center for Education Statistics (NCES)
 
 We unzip these files for direct use in this tutorial. We also set a generous download timeout given that several files are quite large.
 
-Users should note that a small, anonymized random sample of North Carolina voter registration data is included in the QOR package for demonstration purposes. This sample data is used in the address cleaning example below. For real applications, however, users will need to obtain their own voter registration data from a relevant governmental unit (or a paid provider).
+Users should note that a cleaned verison of our small, anonymized random sample of North Carolina voter registration data is included in the QOR package for educational purposes. This sample data results from the address cleaning example further below. For real applications, however, users will need to obtain their own voter registration data from a relevant governmental unit (or a paid provider like L2).
 
 ```{r download, eval=TRUE, message=FALSE, warning=FALSE}
 # Increase timeout for large files
@@ -71,7 +71,7 @@ Before using QOR, it is imperative to ensure that your input data contain a mini
 - city
 - state
 
-You may find that these components themselves must be built from other sub-components (e.g., street name, street number, apartment number, etc...). Below, we read-in our small random sample of anonymous voters before address processing:
+You may find that these components must be built from other sub-components (e.g., street name, street number, apartment number, etc...). Below, we read-in our small random sample of anonymous voters before address processing. Note that the "ncid" field is randomized and does not correspond to actual voter IDs.
 
 ```{r cleaning, eval=TRUE, message=FALSE, warning=FALSE}
 # Download anonymized voter registration extracts (Taken Jan. 1, 2022)
@@ -87,10 +87,10 @@ Then, we can prepare addresses for geocoding. Our example was written in Stata a
 
 **Example workflow:**
 
-- Load raw data
-- Rename address component variables to a standard format across the data years that you are using
-- Convert all address components/subcomponents to strings (e.g., string variables for street, city, postalcode, and state)
-- _Likely Needed:_ Construct the street address from subcomponents
+- Load raw address data
+- Rename address component variables to a standard format across data years
+- Convert all address components and/or their subcomponents to strings (e.g., string variables for street, city, postalcode, and state)
+- _Likely Needed:_ Construct the _full_ street address from subcomponents to the extent possible given data availability
 - Remove leading/trailing whitespace in all variables
 - Make sure to retain or generate a unique state voter (or other unit) id along with separate variables for street, city, postalcode, and state
 
@@ -108,7 +108,7 @@ suppressWarnings(stata(src = paste0(local_path, "data-raw/NCAddresses.do"), stat
 # Next Steps
 
 Different raw data structures will require unique approaches to produce a format compatible with QOR functions. However, With cleaned addresses, you are now ready to geocode your data and apply the QOR method. 
-Your addresses should look similar to the following example input dataframe when correctly prepared for query():
+Your addresses should look similar to the following example input dataframe when correctly prepared for `query()`.
 
 ```{r example_addresses, eval=TRUE, message=FALSE, warning=FALSE}
 # Read the cleaned example addresses
@@ -118,7 +118,7 @@ example <- haven::read_dta(system.file("example_data", "sample_2022_addresses.dt
 print(head(example, n = 10))
 ```
 
-Please see the [Getting Started](https://adam-p-shepardson.github.io/QOR/articles/getting-started.html) vignette and the function documentation for further guidance.
+Please see the [Getting Started](https://adam-p-shepardson.github.io/QOR/articles/getting-started.html) vignette and the function documentation for additional guidance.
 
 ```{r hidden_setup_end, include=FALSE, eval=TRUE}
 # Hidden code chunk for deleting downloaded files after use

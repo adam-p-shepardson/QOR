@@ -14,23 +14,26 @@ QOR is a set of interwoven geospatial data management strategies which help addr
 
 1. Query
 
-Leverage the U.S. Census Geocoder (or any Geocoding sevice of your choice) to transform addresses into precise longitude/latitude coordinates. The _query()_ function is a wrapper around the excellent _tidygeocoder_ (Cambon et al., 2021) that has been tailored to our specific data. We recommend _tidygeocoder_ for easily geocoding addresses in R, and provide _query()_ as a way to demonstrate how users can adapt _tidygeocoder_ for use with voter files.
+Leverage the U.S. Census Geocoder (or any Geocoding sevice of your choice) to transform addresses into precise longitude/latitude coordinates. The `query()` function is a wrapper around the excellent _tidygeocoder_ (Cambon et al., 2021) that has been tailored to our specific data. We recommend _tidygeocoder_ for easily geocoding addresses in R, and provide `query()` as a way to demonstrate how users can adapt _tidygeocoder_ for use with voter files.
    
 2. Overlay
 
-Superimpose school district shapefiles onto voter point geometries and exploit spatial object intersections to match voters with districts. The _overlay()_ function takes in point geometries (voter locations) and polygon geometries (school district boundaries) with unique identifer columns, and returns a dataset that matches each point to one polygon. For edge cases where points fall within multiple polygons or no polygons, the function calculates distances to polygon internal points and assigns points to the nearest polygon.
+Superimpose school district shapefiles onto voter point geometries and exploit spatial object intersections to match voters with districts. The `overlay()` function takes in point geometries (voter locations) and polygon geometries (school district boundaries) with unique identifer columns, and returns a dataset that matches each point to one polygon. For edge cases where points fall within multiple polygons or no polygons, the function calculates distances to polygon internal points and assigns points to the nearest polygon.
 
 3. Recover
 
-For the small portion of voters who cannot be located through an exact address match, assign the nearest school district to their registration zipcode. The _recover()_ function takes in units (with zipcodes), school district polygon geometries, and zipcode polygon geometries with unique identifer columns. It then calculates distances between the centroids for each zipcode and internal points for each school district, and returns a dataset that matches each voter to their nearest school district based on these new points.
+For the small portion of voters who cannot be located through an exact address match, assign the nearest school district to their registration zipcode. The `recover()` function takes in units (with zipcodes), school district polygon geometries, and zipcode polygon geometries with unique identifer columns. It then calculates distances between the centroids for each zipcode and internal points for each school district, and returns a dataset that matches each voter to their nearest school district based on these new points.
 
 # TL;DR
+
 We provide template code for matching voters to school districts via this repository and welcome the use and modification of our code, with proper citation. Each step corresponds to a function in the QOR package:
-- _query()_ for geocoding addresses into point geometries
-- _overlay()_ for matching point geometries to polygon geometries (likely has the most general utility)
-- _recover()_ for assigning unmatched points to polygons based on zipcode centroids
+
+- `query()` for geocoding addresses into point geometries
+- `overlay()` for matching point geometries to polygon geometries
+- `recover()` for assigning unmatched points to polygons based on zipcode centroids
 
 # Installation
+
 To install the QOR package, use the following code in R:
 
 ```R 
@@ -39,6 +42,7 @@ To install the QOR package, use the following code in R:
 Please note that installing the _sf_ (Pebesma & Bivand, 2023) dependency is more difficult on MacOS and Linux than for Windows. Mac and Linux users may need to follow the instructions here before installing QOR: https://github.com/r-spatial/sf 
 
 # Minimal Data Requirements
+
 QOR requires voter postal addresses, school district shapefiles, zipcode shapefiles, and a state boundary shapefile, with any time-varying shapes ideally obtained on a yearly basis. These undemanding data requirements can also accommodate paid voter files (including popular products from vendors L2 and Catalist) provided these products contain registration address information. School district shapefiles from the [NCES Education Demographic and Geographic Estimates (EDGE) program](https://nces.ed.gov/programs/edge/Geographic/DistrictBoundaries) and zipcode shapefiles from the [Census TIGER/LINE database](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html) are preferred for use with QOR. Note that it is difficult to download unzipped folders directly in R, and downloading .zip file versions is much easier. 
 
 For example, it is possible to copy a link to .zip folders and unzip them in R like so:

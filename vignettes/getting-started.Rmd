@@ -35,7 +35,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-The following brief tutorial demonstrates how to use the three main functions in the QOR package: `query()`, `overlay()`, and `recover()`. This example uses a small sample of North Carolina voter addresses and North Carolina school district, state, and zip code shapefiles.
+The following brief tutorial demonstrates how to use the three main functions in the QOR package: `query()`, `overlay()`, and `recover()`. This example uses an anonymized sample of voter addresses as well as school district, state, and zip code shapefiles from North Carolina.
 
 # Load Package and Data
 
@@ -155,7 +155,7 @@ test_recover <- recover(
 
 QOR leverages the fact that voters, school districts, and zip codes are all spatial entities convertable to the same coordinate reference system (CRS). 
 
-The visualization below shows, conceptually, the three different layers. Geocoded voter points (from `query()`) can be overlaid onto school district polygons (from `overlay()`) to identify which voters live in which districts. For unmatched voters, QOR uses zip code polygons (from `recover()`) as an intermediary spatial unit to help assign voters to districts based on proximity.
+The visualization below shows, conceptually, the three different layers. Geocoded voter points from `query()` can be overlaid onto school district polygons used in `overlay()` to identify which voters live in which districts. For unmatched voters, QOR uses zip code polygons in `recover()` as an intermediary spatial unit to help assign voters to districts based on proximity.
 
 ```{r why_it_works, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE}
 
