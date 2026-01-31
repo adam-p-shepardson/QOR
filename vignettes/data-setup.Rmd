@@ -44,7 +44,7 @@ We unzip these files for direct use in this tutorial. We also set a generous dow
 
 Users should note that a small, anonymized random sample of North Carolina voter registration data is included in the QOR package for demonstration purposes. This sample data is used in the address cleaning example below. For real applications, however, users will need to obtain their own voter registration data from a relevant governmental unit (or a paid provider).
 
-```{r download}
+```{r download, eval=TRUE, message=FALSE, warning=FALSE}
 # Increase timeout for large files
 options(timeout = 1000)
 
