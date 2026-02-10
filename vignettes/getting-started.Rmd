@@ -234,27 +234,44 @@ create_3d_plot <- function(shapefiles, z_offsets, colors, labels, angle_x = 45, 
     # Get geometry type for the shapefile
     geom_type <- unique(st_geometry_type(shapefile))
     
-    # Handle polygons
+    # Plotting the polygons
     if (any(geom_type %in% c("POLYGON", "MULTIPOLYGON"))) {
+      
+      # Sample only about 70% of the polygons (save RAM)
+      sample_size <- floor(0.7 * nrow(shapefile))
+      sample_index <- sample(seq_len(nrow(shapefile)), sample_size)
+      
       for (j in seq_len(nrow(shapefile))) {
+        if (!j %in% sample_index) {
+          next 
+        } # Skip non-sampled polygons
         polygon <- st_geometry(shapefile[j, ])
         coords <- st_coordinates(polygon)
         coords[, "Z"] <- z_offset  # Uniform Z-offset
+
+        # Divide total num of points by some arbitrary value to build less technically demanding figures (reduce points for large polygons to improve performance)
+        decimation <- max(1, nrow(coords) %/% 500)
+        idx <- seq(1, nrow(coords), by = decimation)
+        coords <- coords[idx, ]
         
         # Plot each ring separately
         unique_rings <- unique(coords[, "L1"])
         for (ring in unique_rings) {
           ring_coords <- coords[coords[, "L1"] == ring, ]
-          lines3d(ring_coords[, 1], ring_coords[, 2], ring_coords[, 3], col = color, lwd = 2)
+          lines3d(ring_coords[, 1], ring_coords[, 2], ring_coords[, 3], col = color, lwd = 1)
         }
       }
     }
     
-    # Handle points
+    # Plotting Points
     if (any(geom_type == "POINT")) {
       coords <- st_coordinates(shapefile)
+      # Only keep 500 random points (became too much)
+      n_keep <- min(500, nrow(coords))
+      keep_idx <- sample(seq_len(nrow(coords)), n_keep)
+      coords <- coords[keep_idx, ]
       coords[, "Z"] <- coords[, "Z"] + z_offset  # Adjust existing 0 Z-values
-      points3d(coords[, 1], coords[, 2], coords[, 3], col = color, alpha = 0.6, size = 3)
+      points3d(coords[, 1], coords[, 2], coords[, 3], col = color, alpha = 0.6, size = 2)
     }
   }
   
@@ -298,11 +315,13 @@ create_3d_plot <- function(shapefiles, z_offsets, colors, labels, angle_x = 45, 
 create_3d_plot(shapefiles, z_offsets, colors, labels)
 
 # Set the size of the 3D plot window
-rgl::par3d(windowRect = c(0, 0, 1920, 1080))  # 1920x1080 resolution
+rgl::par3d(windowRect = c(0, 0, 1280, 720)  # 1280x720 resolution
 
 # Capture the 3D plot for HTML output
 rglwidget()
 ```
+
+Note: The 3D plot above is interactive! Feel free to rotate and zoom to explore the layers. We only load about 70% of districts and zipcodes at random to reduce browser memory burden. Simulated "voter" points are also randomly distributed without regard to population densities.
 
 ```{r hidden_setup_end, include=FALSE, eval=TRUE}
 # Hidden code chunk for deleting downloaded files after use
