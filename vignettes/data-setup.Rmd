@@ -13,6 +13,16 @@ knitr::opts_chunk$set(
   comment = "#>",
   eval = FALSE
 )
+# identify root path
+here::i_am(".here")
+
+# create the data-raw/Downloads and data-raw/Extracted folders if they don't exist
+if (!dir.exists(paste0(here::here(), "data-raw/Downloads"))) {
+  dir.create(paste0(here::here(), "data-raw/Downloads"), recursive = TRUE)
+}
+if (!dir.exists(paste0(here::here(), "data-raw/Extracted"))) {
+  dir.create(paste0(here::here(), "data-raw/Extracted"), recursive = TRUE)
+}
 ```
 
 # Helpful Packages
@@ -98,7 +108,8 @@ Then, we can prepare addresses for geocoding. Our example was written in Stata a
 # We call an external Stata .do file (available on GitHub) for simplicity:
 library(RStata)
 options("RStata.StataPath" = "/usr/local/stata19/stata-se") # Path to your Stata executable. Use console version instead of GUI (stata-se instead of xstata-se)
-suppressWarnings(stata(src = paste0(local_path, "data-raw/NCAddresses.do"), stata.version = 19.5))
+suppressWarnings(stata(src = paste0(local_path, "data-raw/NCAddresses.do"), stata.version = 19.5, stata.echo = TRUE, 
+              arguments = shQuote(local_path)))
 
 # Note: The above line requires the RStata package (install.packages("RStata")) and a local installation of Stata
 # If using GUI version (xstata-se), GTK warnings may appear but can be ignored if output is correct
@@ -120,9 +131,7 @@ print(head(example, n = 10))
 Please see the [Getting Started](https://adam-p-shepardson.github.io/QOR/articles/getting-started.html) vignette and the function documentation for additional guidance.
 
 ```{r hidden_setup_end, include=FALSE, eval=TRUE}
-# Hidden code chunk for deleting downloaded files after use
-local_path <- "~/GitHub/Academic/QOR/"
-
+## Hidden code chunk for deleting downloaded files after use
 # Zipped files
 files_to_delete <- c(paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), paste0(local_path, "data-raw/Downloads/zip_codes_2022.zip"), 
 paste0(local_path, "data-raw/Downloads/state_shape.zip"), paste0(local_path, "data-raw/Downloads/district_shapes_2022.zip"))

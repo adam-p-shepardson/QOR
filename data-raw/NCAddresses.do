@@ -1,7 +1,7 @@
 clear all
 
 // Set up path
-global path "~/GitHub/Academic/QOR" // replace with your local path to the QOR repository
+global path "`1'" // takes the path passed by R code
 
 cd "$path/"
 
