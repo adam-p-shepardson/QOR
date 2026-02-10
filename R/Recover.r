@@ -14,7 +14,7 @@
 #' @param polygons sf object containing polygon geometries (e.g., school districts).
 #' @param zipcodes sf object containing zipcode tabulation area geometries (ZCTAs).
 #' @param unit_id Name of the column in the units dataframe that contains unique identifiers for each unit (default: "unit_id"). Preferably as string.
-#' @param unit_zip Name of the column in the units dataframe that contains the zipcodes (default: "postalcode").
+#' @param unit_zip Name of the column in the units dataframe that contains the zipcodes (default: "postalcode"). Preferably as string. NOTE: users strongly recommended to first compare unit_zip's formatting to the zip_id column in the zipcodes object.
 #' @param polygon_id Name of the column in the polygons sf object that contains unique identifiers for each polygon (default: "polygon_id"). Preferably as string.
 #' @param zip_id Name of the column in the zipcodes sf object that contains unique identifiers for each zipcode (default: "postalcode"). Preferably as string.
 #' @param state_shape sf object containing the shape of the state (used to filter zipcodes to the state).
@@ -22,9 +22,9 @@
 #' @param FIPS_code State FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state).
 #' @param FIPS_col Column name in your polygons dataset containing FIPS_code. Preferably should be a character/string variable (default: NULL, which means no filtering by state).
 #'
-#' @return A tibble with five columns: unit_id (string), polygon_id (string), postalcode (string), distance (numeric, meters), and a binary flag for matched_byzip, where each unit_id is matched to one polygon_id.
+#' @return A list with two items: (1) Tibble with five columns: unit_id (string), polygon_id (string), postalcode (string), distance (numeric, meters), and a binary flag for matched_byzip, where each unit_id is matched to one polygon_id. (2) Tibble for units that could not be matched to a zipcode (i.e., no recovery possible) with columns for unit_id and postalcode.
 #'
-#' @importFrom dplyr filter mutate tibble rename_with slice_min
+#' @importFrom dplyr filter mutate tibble rename_with slice_min select
 #' @importFrom magrittr %>%
 #' @importFrom tidyr pivot_longer
 #' @importFrom tictoc tic.clearlog tic toc
@@ -148,6 +148,7 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
   missing_count <- 0
   
   ## Assign the recovered units to the closest polygon to zip centroid (based on internal point)
+  no_zip <- tibble()
   for(uid in all_ids) {
     id_count <- id_count + 1
       if (id_count %% 1000 == 0) { # progress update every 1000 ids
@@ -159,11 +160,11 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
       filter(., unit_id == uid)
     my_zip <- stringr::str_trim(temp$postalcode[1], side = "both")
     if(nchar(my_zip) > 5) {
-      # If zipcode is hyphenated, just use first 5 digits
+      # To account for hyphenated zipcodes, just use first 5 digits
       my_zip <- stringr::str_sub(my_zip, 1, 5)
     }
     # Filter statedistances dataset to just that zip; extract closest polygon_id
-    data <- statedistances %>% dplyr::filter(., postalcode == my_zip) %>% dplyr::slice_min(distance, n = 1, with_ties = FALSE)
+    data <- statedistances %>% dplyr::filter(., .data$postalcode == my_zip) %>% dplyr::slice_min(distance, n = 1, with_ties = FALSE)
     # Follow-through on binding to unmatchedset only if zipcode was actually in statedistances (i.e., in the state based on Census ZCTAs)
     if(length(unique(data$postalcode)) == 1) {
       # Extract information to correct row in unmatchedset
@@ -171,7 +172,12 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
       unmatchedset$distance[unmatchedset$unit_id == uid] <- data$distance
       unmatchedset$postalcode[unmatchedset$unit_id == uid] <- data$postalcode
     } else if(length(unique(data$postalcode)) != 1) {
-      unmatchedset <- unmatchedset %>% dplyr::filter(., unit_id != uid) # Remove from unmatchedset if no match possible (zip not in census shapefile for the state)
+      # store units with no zip match in separate dataset to return/inspect 
+      temp2 <- unmatchedset %>% dplyr::filter(., .data$unit_id == uid) %>% dplyr::select(., -c(matched_byzip, polygon_id, distance))
+      no_zip <- dplyr::bind_rows(no_zip, temp2) 
+      no_zip$postalcode[no_zip$unit_id == uid] <- my_zip
+      # Remove from unmatchedset if no match possible (zip not in census shapefile for the state)
+      unmatchedset <- unmatchedset %>% dplyr::filter(., .data$unit_id != uid) 
       missing_count <- missing_count + 1
     }
   }
@@ -184,13 +190,17 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
   # Recover user's original unit_id and polygon_id names
   colnames(unmatchedset)[colnames(unmatchedset) == "unit_id"] <- unit_id
   colnames(unmatchedset)[colnames(unmatchedset) == "polygon_id"] <- polygon_id
-  # label distance column and flag for matched_byzip
-  attr(unmatchedset$distance, "label") <- "Distance (m), zipcode centroid to polygon internal point"
+  colnames(unmatchedset)[colnames(unmatchedset) == "postalcode"] <- unit_zip
+  colnames(no_zip)[colnames(no_zip) == "postalcode"] <-  unit_zip
+  colnames(no_zip)[colnames(no_zip) == "postalcode"] <- unit_zip
+  # label flag for matched_byzip
   attr(unmatchedset$matched_byzip, "label") <- "unit_id matched to polygon_id by zipcode (1 = yes)"
   
   # Return the unmatchedset
   tictoc::toc(log = TRUE) # print full time
   message(paste0("Note: Could not recover a match for ", as.character(missing_count), " units because their zipcodes were not found in state's Census zipcodes."))
-  return(unmatchedset)
+  
+  # Return final list object
+  return(list(zip_matched = unmatchedset, no_zip = no_zip))
 
 }

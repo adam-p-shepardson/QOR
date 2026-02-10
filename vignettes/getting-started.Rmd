@@ -151,6 +151,10 @@ test_recover <- recover(
   FIPS_code = "37",
   FIPS_col = "STATEFP"
 )
+
+matched_byzip <- test_recover[[1]]    # Successfully matched to a district by zipcode
+no_zip <- test_query[[2]]  # Failed to map unit zip code to a Census-recognized zip code for that year
+
 ```
 
 
