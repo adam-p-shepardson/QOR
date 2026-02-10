@@ -191,7 +191,7 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
   colnames(unmatchedset)[colnames(unmatchedset) == "unit_id"] <- unit_id
   colnames(unmatchedset)[colnames(unmatchedset) == "polygon_id"] <- polygon_id
   colnames(unmatchedset)[colnames(unmatchedset) == "postalcode"] <- unit_zip
-  colnames(no_zip)[colnames(no_zip) == "postalcode"] <-  unit_zip
+  colnames(no_zip)[colnames(no_zip) == "unit_id"] <- unit_id
   colnames(no_zip)[colnames(no_zip) == "postalcode"] <- unit_zip
   # label flag for matched_byzip
   attr(unmatchedset$matched_byzip, "label") <- "unit_id matched to polygon_id by zipcode (1 = yes)"
@@ -199,7 +199,7 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
   # Return the unmatchedset
   tictoc::toc(log = TRUE) # print full time
   message(paste0("Note: Could not recover a match for ", as.character(missing_count), " units because their zipcodes were not found in state's Census zipcodes."))
-  
+
   # Return final list object
   return(list(zip_matched = unmatchedset, no_zip = no_zip))
 
