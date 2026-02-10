@@ -53,7 +53,7 @@ This function:
 \item Assigns units (e.g., voters) to polygon geometries (e.g., school districts) using zipcodes as a spatial crosswalk.
 \item Requires that all units, polygons, and zipcodes each have a unique identifier column.
 \item If observations are not unique (e.g., panel data), use only one timepoint per function call (e.g., all voters in one year, then all voters from the next year, etc.).
-\item Returns a match that assigns \strong{one} polygon to each unit: the polygon whose internal point is closest to the centroid of that unit's zipcode.
+\item Returns a match that assigns \strong{one} polygon to each unit: the polygon whose internal point is closest to the centroid of that unit's zipcode. The function also returns units that could not be matched to a zipcode as a second table.
 \item Intended for cases where the "Query" operation fails to convert an address to a point geometry.
 \item To return multiple polygons per unit, you will need to modify the code.
 }
