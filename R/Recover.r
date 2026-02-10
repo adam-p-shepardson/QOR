@@ -13,15 +13,16 @@
 #' @param units Dataframe or tibble containing unit information (must have unique unit_id and a zipcode variable).
 #' @param polygons sf object containing polygon geometries (e.g., school districts).
 #' @param zipcodes sf object containing zipcode tabulation area geometries (ZCTAs).
-#' @param unit_id Name of the column in the units dataframe that contains unique identifiers for each unit (default: "unit_id").
+#' @param unit_id Name of the column in the units dataframe that contains unique identifiers for each unit (default: "unit_id"). Preferably as string.
 #' @param unit_zip Name of the column in the units dataframe that contains the zipcodes (default: "postalcode").
-#' @param polygon_id Name of the column in the polygons sf object that contains unique identifiers for each polygon (default: "polygon_id").
-#' @param zip_id Name of the column in the zipcodes sf object that contains unique identifiers for each zipcode (default: "postalcode").
+#' @param polygon_id Name of the column in the polygons sf object that contains unique identifiers for each polygon (default: "polygon_id"). Preferably as string.
+#' @param zip_id Name of the column in the zipcodes sf object that contains unique identifiers for each zipcode (default: "postalcode"). Preferably as string.
 #' @param state_shape sf object containing the shape of the state (used to filter zipcodes to the state).
-#' @param used_NCES Boolean indicating whether the user input NCES school district shapefiles or other shapefiles with a state_FIPS code as the polygons (default: TRUE).
-#' @param state_FIPS State FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state).
+#' @param used_NCES Boolean indicating whether the user input NCES school district shapefiles or other shapefiles with a state FIPS_code as the polygons (default: FALSE).
+#' @param FIPS_code State FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state).
+#' @param FIPS_col Column name in your polygons dataset containing FIPS_code. Preferably should be a character/string variable (default: NULL, which means no filtering by state).
 #'
-#' @return A tibble with five columns: unit_id, polygon_id, postalcode, distance, and a binary flag for matched_byzip, where each unit_id is matched to one polygon_id.
+#' @return A tibble with five columns: unit_id (string), polygon_id (string), postalcode (string), distance (numeric, meters), and a binary flag for matched_byzip, where each unit_id is matched to one polygon_id.
 #'
 #' @importFrom dplyr filter mutate tibble rename_with slice_min
 #' @importFrom magrittr %>%
@@ -29,10 +30,10 @@
 #' @importFrom tictoc tic.clearlog tic toc
 #' @importFrom sf st_make_valid st_transform st_point_on_surface st_crs st_filter st_centroid st_distance
 #' @importFrom tibble rownames_to_column
-#' @importFrom stringr str_split_i
+#' @importFrom stringr str_trim str_sub
 #' @export
 recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "unit_id", unit_zip = "postalcode", 
-    polygon_id = "polygon_id", zip_id = "postalcode", state_shape = NULL, used_NCES = TRUE, state_FIPS = NULL) {
+    polygon_id = "polygon_id", zip_id = "postalcode", state_shape = NULL, used_NCES = FALSE, FIPS_code = NULL, FIPS_col = NULL) {
   
     tictoc::tic.clearlog() # clear time log as safety check
     tictoc::tic("Runtime: Recover Full Time") # Start timer for the entire recover process
@@ -54,6 +55,16 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
         stop("State shape must be an sf object (convert to sf format using functions from sf package).")
     } else if (length((unique(units[[unit_id]]))) != length(units[[unit_id]])) {
         stop(paste("The unit_id ('", unit_id, "') does not uniquely identify each row in the units dataset.", sep = ""))
+    } else if (length((unique(polygons[[polygon_id]]))) != length(polygons[[polygon_id]])) {
+        stop(paste("The polygon_id ('", polygon_id, "') does not uniquely identify each row in the polygons dataset.", sep = ""))
+    } else if (length((unique(zipcodes[[zip_id]]))) != length(zipcodes[[zip_id]])) {
+        stop(paste("The zip_id ('", zip_id, "') does not uniquely identify each row in the zipcodes dataset.", sep = ""))
+    } else if (!is.null(FIPS_code) & is.null(FIPS_col)) {
+        stop("If you provide a value for FIPS_code, you must also provide the name of the column containing state FIPS codes in your polygons dataset (FIPS_col).")
+    } else if (is.null(FIPS_code) & !is.null(FIPS_col)) {
+        stop("If you provide a value for FIPS_col, you must also provide a value for FIPS_code to filter your polygons dataset by state.")
+    } else if (!is.null(FIPS_col) & !FIPS_col %in% names(polygons)) {
+        stop(paste("The FIPS_col ('", FIPS_col, "') provided was not found in the polygons dataset.", sep = ""))
     } else { # Can proceed after equalizing crs
         # Clean up geometries
         polygons <- polygons %>%
@@ -68,26 +79,40 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
 
         # Convert custom names to standard names
         colnames(units)[colnames(units) == unit_id] <- "unit_id" 
+        if (!is.character(units$unit_id)) {
+          units$unit_id <- as.character(units$unit_id)
+        }
         colnames(units)[colnames(units) == unit_zip] <- "postalcode"
+        if(!is.character(units$postalcode)) {
+            units$postalcode <- as.character(units$postalcode)
+        }
         colnames(polygons)[colnames(polygons) == polygon_id] <- "polygon_id"
+        if (!is.character(polygons$state_fips)) {
+          polygons$state_fips <- as.character(polygons$state_fips)
+        }
         colnames(zipcodes)[colnames(zipcodes) == zip_id] <- "postalcode"
+        if (!is.character(zipcodes$postalcode)) {
+          zipcodes$postalcode <- as.character(zipcodes$postalcode)
+        }
+        if (!is.null(FIPS_col)) {
+          colnames(polygons)[colnames(polygons) == FIPS_col] <- "state_fips"
+          if (!is.character(polygons$state_fips)) {
+            polygons$state_fips <- as.character(polygons$state_fips)
+          }
+        }
 
-        # Make postalcode column character if not already
-        units$postalcode <- as.character(units$postalcode)
+        # If NCES shapefiles but user is not filtering, inform about ability to filter polygons to the state FIPS code
+        if (used_NCES == TRUE & (is.null(FIPS_code) | is.null(FIPS_col))) {
+          warning(paste(
+          "Raw NCES school district shapefiles are national and we can use a State FIPS code to filter them (massively reduce compute time).\nWe strongly suggest providing a value for state_FIPS (e.g., '37' for North Carolina)."
+          ))
+        } 
 
-        # If NCES shapefiles, can filter polygons to the state FIPS code
-        if (used_NCES == TRUE & is.null(state_FIPS)) {
-        warning(paste(
-          "Raw NCES school district shapefiles are national and we can use a State FIPS code to filter them (massively reduce compute time).\nWe strongly suggest providing a value for state_FIPS code (e.g., '37' for North Carolina)."
-        ))
-        } else if (used_NCES == TRUE & !is.null(state_FIPS)) {
-            temp <- polygons %>% dplyr::rename_with(tolower) 
-            colnames(polygons)[startsWith(names(temp), "state")] <- "state_fips"
-            polygons <- polygons %>%
-            dplyr::mutate(state_fips = as.character(.data$state_fips)) %>%
-            dplyr::filter(., state_fips == as.character(state_FIPS)) # filters polygons to the state FIPS code
-            rm(temp)
-        }  
+        # Filter down to state FIPS code if user is providing FIPS
+        if (!is.null(FIPS_code) & !is.null(FIPS_col)) {
+          polygons <- polygons %>%
+          dplyr::filter(., .data$state_fips == as.character(FIPS_code)) # filters polygons to the state FIPS code
+        } 
     }
   
   # Find zip centroids
@@ -130,13 +155,13 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
     # Get the unit's postalcode
     temp <- units %>% 
       filter(., unit_id == uid)
-    my_zip <- temp$postalcode[1]
+    my_zip <- stringr::str_trim(temp$postalcode[1], side = "both")
     if(nchar(my_zip) > 5) {
       # If zipcode is hyphenated, just use first 5 digits
-      my_zip <- stringr::str_split_i(my_zip, pattern = "-", i = 1)
+      my_zip <- stringr::str_sub(my_zip, 1, 5)
     }
     # Filter statedistances dataset to just that zip; extract closest polygon_id
-    data <- statedistances %>% dplyr::filter(., postalcode == my_zip) %>% dplyr::slice_min(distance, n = 1)
+    data <- statedistances %>% dplyr::filter(., postalcode == my_zip) %>% dplyr::slice_min(distance, n = 1, with_ties = FALSE)
     # Follow-through on binding to unmatchedset only if zipcode was actually in statedistances (i.e., in the state based on Census ZCTAs)
     if(length(unique(data$postalcode)) == 1) {
       # Extract information to correct row in unmatchedset

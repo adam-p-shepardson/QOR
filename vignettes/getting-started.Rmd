@@ -127,7 +127,8 @@ test_overlay <- overlay(
   point_id = "statevoterid",
   polygon_id = "GEOID",
   used_NCES = TRUE,
-  state_FIPS = "37"
+  FIPS_code = "37",
+  FIPS_col = "STATEFP"
 )
 ```
 
@@ -146,7 +147,8 @@ test_recover <- recover(
   zip_id = "ZCTA5CE20",
   state_shape = state_shape,
   used_NCES = TRUE,
-  state_FIPS = "37"
+  FIPS_code = "37",
+  FIPS_col = "STATEFP"
 )
 ```
 

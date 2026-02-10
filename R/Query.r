@@ -5,20 +5,21 @@
 #' This function:
 #' - Assigns longitude and latitude coordinates to units (e.g., voters) based on their street address, city, and state.
 #' - Acts as a wrapper around `tidygeocoder::geocode()`, while also handling additional processing needed for individual voter data and preparing for subsequent QOR Method steps.
-#' - **Note:** This function does not perform any matching to polygons or zip codes; it simply geocodes the addresses.
-#' - Allows you to choose any geocoding service available in the `tidygeocoder` package (we recommend using the "census" method for best results).
+#' - **Note:** This function does not perform any matching to polygons below the state-level or to zip codes; it simply geocodes the addresses.
+#' - Focuses on the Census geocoding service accessible through the `tidygeocoder` package (we recommend using the "census" method for best results). You will need to modify the code to use different geocoding services.
 #'
 #' @param units Dataframe or tibble containing voter information (must have unique unit_id, street, city, and state columns).
-#' @param unit_id Name of the column in the units dataframe that contains the unique identifiers for each unit (default: "unit_id").
+#' @param unit_id Name of the column in the units dataframe that contains the unique identifiers for each unit (default: "unit_id"). Preferably as string.
 #' @param street Name of the column in the units dataframe that contains the street address (default: "street").
 #' @param city Name of the column in the units dataframe that contains the city (default: "city").
 #' @param state Name of the column in the units dataframe that contains the state (default: "state").
 #' @param state_shape sf object containing the shape of the state (used to filter geocoding results to the state, catching errors).
-#' @param year Year of the data (default: NULL, which throws an error). Program was designed for years 2007 through 2025. Years <= 2010 will use the 2010 Census database, and years > 2025 will use the current Census database.
+#' @param year Year of the data (preferably numeric) for use with "census" method. (default: NULL, which throws an error). Program was designed for years 2007 through 2025 using the "census" method. Years <= 2010 will use the 2010 Census database, and years > 2025 will use the current Census database.
 #' @param units_per_batch Number of units to geocode in each batch (default: 4000). Internet connectivity and API limits determine possibility of larger (or smaller) batches. The Census theoretically allows batches of up to 10,000 addresses, but we have found that smaller batches are less likely to be rejected by the API.
-#' @param method Geocoding method to use (default: "census"). See methods from tidygeocoder::geocode(). We recommend "census" for best cost (free) and batch geocoding. You may need to adjust parts of code that set variable names if using different method, and not all methods may support the batch coding that we use by default.
+#' @param method Geocoding method to use (default: "census"). See methods from tidygeocoder::geocode(). We recommend "census" for best cost (free) and batch geocoding. You may need to adjust parts of code that select outputs if using different method, and not all methods may support the batch coding that we use by default.
 #' @param sleep_time Time to pause between batches (default: 2 seconds). Try increasing if you are getting rate-limited by the geocoding service or encountering connection issues.
-#' @param zip_id RECOMMENDED BUT OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Output will have a postalcode column if provided, but this column will be NA if not provided. "Recover" will NOT be able to match any unmatched units if postalcode not provided here.
+#' @param zip_id RECOMMENDED BUT OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Preferably as string. Output will have a postalcode column if provided, but this column will be NA if not provided. "Recover" will NOT be able to match any unmatched units if postalcode not provided here.
+#' @param max_tries Number of times to attempt geocoding for each unit if a call to API fails (default: 15). Try increasing if you are getting rate-limited by the geocoding service or encountering connection issues. If a unit fails to geocode after this many attempts, it will be stored as unmatched and the function will move on to the next unit.
 #'
 #' @return A list with two items: (1) Tibble of matched units with their geocoded coordinates, and (2) Tibble of unmatched units (those that could not be geocoded).
 #'
@@ -26,10 +27,10 @@
 #' @importFrom magrittr %>%
 #' @importFrom tictoc tic.clearlog tic toc
 #' @importFrom tidygeocoder geocode
-#' @importFrom sf st_as_sf st_crs st_transform st_make_valid st_filter read_sf
+#' @importFrom sf st_as_sf st_crs st_transform st_make_valid st_filter read_sf st_drop_geometry
 #' @export
 query <- function(units = NULL, unit_id = "unit_id", street = "street", city = "city", state = "state", state_shape = NULL, 
-units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id = "postalcode") {
+units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id = "postalcode", max_tries = 15) {
 
     tictoc::tic.clearlog() # clear time log as safety check
     tictoc::tic("Runtime: Query Full Time") # Start timer for the entire recover process
@@ -45,17 +46,27 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id =
         stop(paste("The street ('", street, "'), city ('", city, "'), or state ('", state, "') is not found in the units dataset.", sep = ""))
     } else if (!inherits(state_shape, "sf")) {
         stop("State shape must be an sf object (convert to sf format using functions from sf package).")
-    } else if (is.null(year)) {
-        stop(paste("No year value provided. Need a year between 2007 and 2023 to select the closest geocoding database to use."))
+    } else if (!is.character(street) || !is.character(city) || !is.character(state)) {
+        stop("street, city, and state fields must all be string variables.")
+    } else if (is.null(year) & method == "census") {
+        stop(paste("No year value provided. Need a year to select the closest geocoding database to use for 'census' method."))
+    } else if (method != "census") {
+        stop(paste("CAUTION We have only tested the 'census' method for geocoding, and other methods may not work with the batch geocoding approach we use and the current code. If you are using a different method please modify our source code."))
     } else {
         # Convert custom names to standard names
         colnames(units)[colnames(units) == unit_id] <- "unit_id" 
+            if (!is.character(units$unit_id)) {
+                units$unit_id <- as.character(units$unit_id)
+            }
         colnames(units)[colnames(units) == street] <- "str"
         colnames(units)[colnames(units) == city] <- "cty"
         colnames(units)[colnames(units) == state] <- "ste"
         
         if(!is.null(zip_id) && zip_id %in% names(units)) { 
             colnames(units)[colnames(units) == zip_id] <- "postalcode"
+            if(!is.character(units$postalcode)) {
+                units$postalcode <- as.character(units$postalcode)
+            }
         } else {
             units$postalcode <- NA # create a column for postalcode if not provided
         }
@@ -87,7 +98,7 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id =
         rm(sample)
     }
 
-    # Set A Nearby Census Vintage (Note: these were the Census geocoder's valid vintage names through 2023 as of August, 2025)
+    # Set A Nearby Census Vintage (Note: these were the Census geocoder's valid vintage names through 2025 as of Feb., 2026)
     if(yr <= 2010) {
         vin <- "Census2010_Current"
     } else if(yr == 2011 | yr == 2012 | yr == 2013 | yr == 2014 | yr == 2015 | yr == 2016 | yr == 2017) {
@@ -113,6 +124,7 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id =
     }
 
     ## Loop through the samples, referencing the Census TIGER database for address coordinates
+    coord <- dplyr::tibble() # This is a fallback if geocoding for num == 1 fails
     for(num in 1:unitgroups) {
     
         # Print out ticker of where we are
@@ -161,10 +173,11 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id =
     
         single_unit <- sample2 %>% dplyr::filter(., .data$unit_id == v) # filter to one unit
         success <- FALSE 
-    
+        attempt <- 0
         # Detect error and keep trying if there is one (see as a baseline: https://cnuge.github.io/post/trycatch/ and https://stackoverflow.com/questions/68924178/how-to-redo-trycatch-after-error-in-for-loop and https://adv-r.hadley.nz/conditions.html)
-        while(!success) {
-            # infinite tryCatch loop until there is a success. This should exit to my custom error function "wait" the moment the first block returns an error
+        while(!success && attempt < max_tries) {
+            attempt <- attempt + 1
+            # long tryCatch loop until there is a success. Exits to my custom error function "wait" the moment the first block returns an error
             tryCatch(
                 {
                 temp <- geocode(single_unit, street = str, city = cty, state = ste, method = mthd, lat = latitude, 
@@ -179,13 +192,19 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id =
                 message("No fatal error ^_^")
           
             }, error = function(wait) {
-                Sys.sleep(5) # pause five seconds if there is an error
+                Sys.sleep(2) # pause two seconds if there is an error
           
                 message("Retrying, I hit an error -_-")
           
                 }
             )
         }
+        if (!success) {
+        # If failure is persistent after max_tries, store unit and move on to next one
+        timed_out <- single_unit %>% dplyr::mutate(latitude = NA, longitude = NA)
+        test <- dplyr::bind_rows(test, timed_out)
+        message(paste0("Failed to geocode unit ", as.character(v), " after ", as.character(max_tries), " attempts. -_-"))
+        }       
     }
   
     # store the obs that are still unmatched
@@ -217,7 +236,7 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id =
     # Units placed outside state shape will be considered unmatched
     in_state <- sf::st_filter(coord, state_shape) 
     not_instate <- coord %>% dplyr::filter(., !.data$unit_id %in% in_state$unit_id) %>%
-        dplyr::mutate(., longitude = NA, latitude = NA) # We will consider these unmatched
+        dplyr::mutate(., longitude = NA, latitude = NA) %>% sf::st_drop_geometry() # We will consider these unmatched
     coord <- coord %>% 
         dplyr::filter(., .data$unit_id %in% in_state$unit_id)
     

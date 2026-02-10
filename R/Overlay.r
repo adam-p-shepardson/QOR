@@ -11,12 +11,13 @@
 #'
 #' @param points sf object containing point geometries for units (e.g., voter locations).
 #' @param polygons sf object containing polygon geometries (e.g., school districts).
-#' @param point_id Name of the column in the points sf object that contains unique identifiers for each point (default: "point_id").
-#' @param polygon_id Name of the column in the polygons sf object that contains unique identifiers for each polygon (default: "polygon_id").
-#' @param used_NCES Boolean indicating whether the user input NCES school district shapefiles or other shapefiles with a state_FIPS code as the polygons (default: TRUE).
-#' @param state_FIPS State FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state).
+#' @param point_id Name of the column in the points sf object that contains unique identifiers for each point (default: "point_id"). Preferably as string.
+#' @param polygon_id Name of the column in the polygons sf object that contains unique identifiers for each polygon (default: "polygon_id"). Preferably as string.
+#' @param used_NCES Boolean indicating whether the user input NCES school district shapefiles or other shapefiles with a state FIPS_code as the polygons (default: FALSE).
+#' @param FIPS_code State FIPS code to filter NCES or other school district shapefiles (default: NULL, which means no filtering by state).
+#' @param FIPS_col Column name in your dataset containing FIPS_code. Preferably should be a character/string variable (default: NULL, which means no filtering by state).
 #'
-#' @return A tibble with three columns: point_id, polygon_id, and distance (to internal point), where each point_id is matched to one polygon_id.
+#' @return A tibble with three columns: point_id (string), polygon_id (string), and distance (numeric, meters to internal point), where each point_id is matched to one polygon_id.
 #'
 #' @importFrom dplyr filter mutate tibble rename_with slice_min
 #' @importFrom magrittr %>%
@@ -25,8 +26,8 @@
 #' @importFrom sf st_make_valid st_transform st_point_on_surface st_crs st_intersects st_distance
 #' @importFrom tibble rownames_to_column
 #' @export
-overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polygon_id = "polygon_id", used_NCES = TRUE, 
-  state_FIPS = NULL) {
+overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polygon_id = "polygon_id", used_NCES = FALSE, 
+  FIPS_code = NULL, FIPS_col = NULL) {
   
   tictoc::tic.clearlog() # clear time log in case you have a prior run
   tictoc::tic("Runtime: Overlay Full Time") # Start full timer for function
@@ -40,6 +41,14 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
     stop(paste("The point_id ('", point_id, "') or polygon_id ('", polygon_id, "') is not found in the respective datasets.", sep = ""))
   } else if (length((unique(points[[point_id]]))) != length(points[[point_id]])) {
     stop(paste("The point_id ('", point_id, "') does not uniquely identify each row in the points dataset.", sep = ""))
+  } else if (length((unique(polygons[[polygon_id]]))) != length(polygons[[polygon_id]])) {
+    stop(paste("The polygon_id ('", polygon_id, "') does not uniquely identify each row in the polygons dataset.", sep = ""))
+  } else if (!is.null(FIPS_code) & is.null(FIPS_col)) {
+    stop("If you provide a value for FIPS_code, you must also provide the name of the column containing state FIPS codes in your polygons dataset (FIPS_col).")
+  } else if (is.null(FIPS_code) & !is.null(FIPS_col)) {
+    stop("If you provide a value for FIPS_col, you must also provide a value for FIPS_code to filter your polygons dataset by state.")
+  } else if (!is.null(FIPS_col) & !FIPS_col %in% names(polygons)) {
+    stop(paste("The FIPS_col ('", FIPS_col, "') provided was not found in the polygons dataset.", sep = ""))
   } else { # Can proceed after equalizing crs
     # Clean up geometries
     points <- points %>%
@@ -51,32 +60,44 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
 
     # Convert custom names to standard names
     colnames(points)[colnames(points) == point_id] <- "point_id" 
-    colnames(polygons)[colnames(polygons) == polygon_id] <- "polygon_id"
-
-    # If NCES shapefiles, can filter polygons to the state FIPS code
-    if (used_NCES == TRUE & is.null(state_FIPS)) {
-      warning(paste(
-          "Raw NCES school district shapefiles are national and we can use a State FIPS code to filter them (massively reduce compute time).\nWe strongly suggest providing a value for state_FIPS (e.g., '37' for North Carolina)."
-        ))
-    } else if (used_NCES == TRUE & !is.null(state_FIPS)) {
-      temp <- polygons %>% dplyr::rename_with(tolower) 
-      colnames(polygons)[startsWith(names(temp), "state")] <- "state_fips"
-      polygons <- polygons %>%
-      dplyr::mutate(state_fips = as.character(.data$state_fips)) %>%
-      dplyr::filter(., .data$state_fips == as.character(state_FIPS)) # filters polygons to the state FIPS code
-      rm(temp)
+    if (!is.character(points$point_id)) {
+        points$point_id <- as.character(points$point_id)
     }
+    colnames(polygons)[colnames(polygons) == polygon_id] <- "polygon_id"
+    if (!is.character(polygons$polygon_id)) {
+        polygons$polygon_id <- as.character(polygons$polygon_id)
+    }
+    if (!is.null(FIPS_col)) {
+      colnames(polygons)[colnames(polygons) == FIPS_col] <- "state_fips"
+      if (!is.character(polygons$state_fips)) {
+        polygons$state_fips <- as.character(polygons$state_fips)
+      }
+    }
+
+    # If NCES shapefiles but user is not filtering, inform about ability to filter polygons to the state FIPS code
+    if (used_NCES == TRUE & (is.null(FIPS_code) | is.null(FIPS_col))) {
+      warning(paste("Raw NCES school district shapefiles are national and we can use a State FIPS code to filter them (massively reduce compute time).\nWe strongly suggest providing a value for state_FIPS (e.g., '37' for North Carolina)."
+        ))
+    } 
+
+    # Filter down to state FIPS code if user is providing FIPS
+    if (!is.null(FIPS_code) & !is.null(FIPS_col)) {
+      polygons <- polygons %>%
+      dplyr::filter(., .data$state_fips == as.character(FIPS_code)) # filters polygons to the state FIPS code
+    } 
   }
   
   tictoc::tic("Runtime: Point-Polygon Distance Calculation") # Start time for distance calculations
   
   ## For every id, filter down to the polygon that they are in. If they truly straddle the line between two, use the closest one (based on internal point)
+  # Store all intersections for use in loop
+  intersections <- sf::st_intersects(points, polygons) 
   
   # I only need the distances for ids who are in no or multiple polygons
   # Inspired by: https://gis.stackexchange.com/questions/394954/r-using-st-intersects-to-classify-points-inside-outside-and-within-a-buffer
-  in_onedistrict <- lengths(sf::st_intersects(points, polygons)) == 1 # point intersects one polygon
-  in_nodistricts <- lengths(sf::st_intersects(points, polygons)) == 0 # point intersects no polygons
-  in_multipledistricts <- lengths(sf::st_intersects(points, polygons)) > 1 # point intersects several polygons
+  in_onedistrict <- lengths(intersections) == 1 # point intersects one polygon
+  in_nodistricts <- lengths(intersections) == 0 # point intersects no polygons
+  in_multipledistricts <- lengths(intersections) > 1 # point intersects several polygons
   in_onedistrict <- points$point_id[in_onedistrict]
   in_nodistricts <- points$point_id[in_nodistricts]
   in_multipledistricts <- points$point_id[in_multipledistricts]
@@ -91,9 +112,9 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
   
   rm(calculate_these)
   
-  distances <- as.data.frame(distances) #  now have a non-tidy dataframe where columns are polygon_ids, rownames are point_ids, and cells are the distances between the two
+  distances <- as.data.frame(distances, check.names = FALSE) #  now have a non-tidy dataframe where columns are polygon_ids, rownames are point_ids, and cells are the distances between the two
   
-  # Change statedistances to tidy format
+  # Change distances to tidy format
   distances <- rownames_to_column(distances, "point_id") 
   distances <- distances %>% 
     tidyr::pivot_longer(cols = !.data$point_id, names_to = "polygon_id", values_to = "distance") 
@@ -106,11 +127,8 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
   tictoc::toc(log = TRUE) # print Point-Polygon Distance calculation time
   
   ## For each point_id, extract the polygon that they are in, or the closest one otherwise
-  # Store all intersections for use in loop
-  intersections <- sf::st_intersects(points, polygons) 
-  
   # Instantiate dataset for storing final matches (already length of all point_ids)
-  districtset <- dplyr::tibble(point_id = unique(points$point_id), polygon_id = NA, distance = NA)
+  districtset <- dplyr::tibble(point_id = points$point_id, polygon_id = NA, distance = NA)
   
   tictoc::tic("Runtime: Point-Polygon Matching Loop")
   id_count <- 0
@@ -119,21 +137,22 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
     for(vid in in_onedistrict) { # Vast majority of, if not all, cases: Check if in one polygon. Extract that pid.
       # Ticker
       id_count <- id_count + 1
-      message(paste0("Now assigning a polygon to point_id # ", as.character(id_count), " out of the ", as.character(length(in_onedistrict)), " point_id's in only one polygon"))
-      
+        if (id_count %% 1000 == 0) { # progress update every 1000 ids
+          message(paste0("Now assigning a polygon to point_id # ", as.character(id_count), " out of the ", as.character(length(in_onedistrict)), " point_id's in only one polygon"))
+        }
       # Find row # in points for point_id, then feed this row # into intersections to get row # of overlapping polygon in polygons, then feed this row # into polygons$pid to get pid, then store in districtset.
       districtset$polygon_id[districtset$point_id == vid] <- polygons$polygon_id[intersections[[which(points$point_id == vid)]]]
     } 
     for(vid in in_multipledistricts) { # If in several districts, only extract closest *of these*
-      # Filter statedistances dataset to just a single point_id, and then only the rows containing the polygon_ids point_id is in; extract closest polygon_id
-      data <- distances %>% dplyr::filter(., .data$point_id == vid & .data$polygon_id %in% polygons$polygon_id[intersections[[which(points$point_id == vid)]]]) %>% dplyr::slice_min(distance, n = 1)
+      # Filter distances dataset to just a single point_id, and then only the rows containing the polygon_ids point_id is in; extract closest polygon_id
+      data <- distances %>% dplyr::filter(., .data$point_id == vid & .data$polygon_id %in% polygons$polygon_id[intersections[[which(points$point_id == vid)]]]) %>% dplyr::slice_min(distance, n = 1, with_ties = FALSE)
       # Store in districtset
       districtset$polygon_id[districtset$point_id == vid] <- data$polygon_id
       districtset$distance[districtset$point_id == vid] <- data$distance
     } 
     for(vid in in_nodistricts) { # If in no districts, extract closest one
       # Filter statedistances dataset to just a single point_id, extract the row with the closest district (based on internal point)
-      data <- distances %>% dplyr::filter(., .data$point_id == vid) %>% dplyr::slice_min(distance, n = 1)
+      data <- distances %>% dplyr::filter(., .data$point_id == vid) %>% dplyr::slice_min(distance, n = 1, with_ties = FALSE)
       # Store in districtset
       districtset$polygon_id[districtset$point_id == vid] <- data$polygon_id
       districtset$distance[districtset$point_id == vid] <- data$distance

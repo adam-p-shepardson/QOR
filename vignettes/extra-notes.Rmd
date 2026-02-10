@@ -17,7 +17,7 @@ We have, additionally, verified that the QOR package and its functions work with
 
 # Disclaimer
 
-When using data obtained from governments, please consult the laws of the specific government(s) in question to ensure compliance. It is important to understand that U.S. states differ widely in their laws regarding the use of voter registration data. Users are solely responsible for ensuring that their use of the data complies with all applicable laws and regulations. The authors of this package do not assume any liability for users' treatment of any data or their use of the package itself.
+When using data obtained from any level of government, please consult the laws of the specific government(s) in question to ensure compliance. It is important to understand that U.S. states differ widely in their laws regarding the use of voter registration data. Users are solely responsible for ensuring that their use of the data complies with all applicable laws and regulations. The authors of this package do not assume any liability for users' treatment of any data or their use of the package itself.
 
 # Reference List
 
