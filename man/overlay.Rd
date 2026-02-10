@@ -30,7 +30,7 @@ overlay(
 \item{FIPS_col}{Column name in your dataset containing FIPS_code. Preferably should be a character/string variable (default: NULL, which means no filtering by state).}
 }
 \value{
-A tibble with three columns: point_id (string), polygon_id (string), and distance (numeric, meters to internal point), where each point_id is matched to one polygon_id.
+A tibble with three columns: point_id (string), polygon_id (string), and distance (based on units CRS; only for points not in just one polygon). Each point_id is matched to one polygon_id.
 }
 \description{
 The \code{overlay()} function performs the "Overlay" (Step 2) operation from the QOR Method.
