@@ -37,7 +37,7 @@ We provide template code for matching voters to school districts via this reposi
 To install the QOR package, use the following code in R:
 
 ```R 
- devtools::install_github("adam-p-shepardson/QOR", dependencies=TRUE)
+ remotes::install_github("adam-p-shepardson/QOR", dependencies=TRUE)
 ```
 Please note that installing the `sf` (Pebesma & Bivand, 2023) dependency is more difficult on MacOS and Linux than for Windows. Mac and Linux users may need to follow the instructions here before installing QOR: https://github.com/r-spatial/sf 
 
