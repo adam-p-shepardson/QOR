@@ -27,8 +27,7 @@ library(sf)
 library(QOR)
 
 # You would need your local path below to run the setup examples:
-local_path <- "~/GitHub/Academic/QOR/" # example path
-#local_path <- "/path/to/your/QOR/directory/"  # Change this to your local path and delete the above line
+local_path <- here::here() # replace with your local path to the QOR folder if not running from the root directory of the repo
 ```
 
 # Downloading Example Files
