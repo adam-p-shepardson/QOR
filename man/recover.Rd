@@ -27,7 +27,7 @@ recover(
 
 \item{unit_id}{Name of the column in the units dataframe that contains unique identifiers for each unit (default: "unit_id"). Preferably as string.}
 
-\item{unit_zip}{Name of the column in the units dataframe that contains the zipcodes (default: "postalcode").}
+\item{unit_zip}{Name of the column in the units dataframe that contains the zipcodes (default: "postalcode"). Preferably as string. NOTE: users strongly recommended to first compare unit_zip's formatting to the zip_id column in the zipcodes object.}
 
 \item{polygon_id}{Name of the column in the polygons sf object that contains unique identifiers for each polygon (default: "polygon_id"). Preferably as string.}
 
@@ -42,7 +42,7 @@ recover(
 \item{FIPS_col}{Column name in your polygons dataset containing FIPS_code. Preferably should be a character/string variable (default: NULL, which means no filtering by state).}
 }
 \value{
-A tibble with five columns: unit_id (string), polygon_id (string), postalcode (string), distance (numeric, meters), and a binary flag for matched_byzip, where each unit_id is matched to one polygon_id.
+A list with two items: (1) Tibble with five columns: unit_id (string), polygon_id (string), postalcode (string), distance (numeric, meters), and a binary flag for matched_byzip, where each unit_id is matched to one polygon_id. (2) Tibble for units that could not be matched to a zipcode (i.e., no recovery possible) with columns for unit_id and postalcode.
 }
 \description{
 The \code{recover()} function performs the "Recover" (Step 3) operation from the QOR Method.
