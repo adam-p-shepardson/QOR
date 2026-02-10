@@ -36,7 +36,7 @@ query(
 
 \item{year}{Year of the data (preferably numeric) for use with "census" method. (default: NULL, which throws an error). Program was designed for years 2007 through 2025 using the "census" method. Years <= 2010 will use the 2010 Census database, and years > 2025 will use the current Census database.}
 
-\item{method}{Geocoding method to use (default: "census"). See methods from tidygeocoder::geocode(). We recommend "census" for best cost (free) and batch geocoding. You may need to adjust parts of code that select outputs if using different method, and not all methods may support the batch coding that we use by default.}
+\item{method}{Geocoding method to use (default: "census"). See methods from \code{tidygeocoder::geocode()}. We recommend "census" for best cost (free) and batch geocoding. You may need to adjust parts of code that select outputs if using different method, and not all methods may support the batch coding that we use by default.}
 
 \item{sleep_time}{Time to pause between batches (default: 2 seconds). Try increasing if you are getting rate-limited by the geocoding service or encountering connection issues.}
 
