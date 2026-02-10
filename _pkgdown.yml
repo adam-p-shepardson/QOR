@@ -1,6 +1,13 @@
 url: https://adam-p-shepardson.github.io/QOR
 template:
   bootstrap: 5
+  bslib:
+    base_font: {google: "Roboto"}
+    heading_font: {google: "Roboto Slab"}
+    code_font: {google: "Google Sans Code"}
+  light-switch: true
+  theme: github-light
+  theme-dark: github-dark
 
 navbar:
   structure:
@@ -19,3 +26,11 @@ navbar:
     extra-notes:
       text: Extra Notes
       href: articles/extra-notes.html
+
+reference:
+  - title: "QOR Functions"
+    desc: "Each Step of the QOR Method has its own function:"
+    contents:
+      - query
+      - overlay
+      - recover
