@@ -54,20 +54,22 @@ The following brief tutorial demonstrates how to use the three main functions in
 # You would need your local path below to run the setup examples:
 local_path <- here::here()  # Change this to your local path
 
-# Load QOR package for example
+# Packages for example
+library(tidyverse)
+library(sf)
 library(QOR)
 
 # Load example voter addresses
 example <- haven::read_dta(system.file("example_data", "sample_2022_addresses.dta", package = "QOR"))
 
 # Load shapefiles (see Data Setup vignette for download instructions)
-state_shape <- sf::read_sf(dsn = paste0(local_path, "data-raw/Extracted/North_Carolina_State_Boundary")) %>%
+state_shape <- read_sf(dsn = paste0(local_path, "data-raw/Extracted/North_Carolina_State_Boundary")) %>%
   dplyr::summarize(geometry = st_union(geometry)) %>%
-  sf::st_make_valid()
+  st_make_valid()
 zip_shape <- sf::read_sf(dsn = paste0(local_path, "data-raw/Extracted/ZIP_2022")) %>%
-  sf::st_make_valid()
+  st_make_valid()
 district_shape <- sf::read_sf(dsn = paste0(local_path, "data-raw/Extracted/SCHOOL_SY2022")) %>%
-  sf::st_make_valid()
+  st_make_valid()
 ```
 
 # Query: Geocode Addresses
