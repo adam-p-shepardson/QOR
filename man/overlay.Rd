@@ -9,8 +9,9 @@ overlay(
   polygons = NULL,
   point_id = "point_id",
   polygon_id = "polygon_id",
-  used_NCES = TRUE,
-  state_FIPS = NULL
+  used_NCES = FALSE,
+  FIPS_code = NULL,
+  FIPS_col = NULL
 )
 }
 \arguments{
@@ -18,16 +19,18 @@ overlay(
 
 \item{polygons}{sf object containing polygon geometries (e.g., school districts).}
 
-\item{point_id}{Name of the column in the points sf object that contains unique identifiers for each point (default: "point_id").}
+\item{point_id}{Name of the column in the points sf object that contains unique identifiers for each point (default: "point_id"). Preferably as string.}
 
-\item{polygon_id}{Name of the column in the polygons sf object that contains unique identifiers for each polygon (default: "polygon_id").}
+\item{polygon_id}{Name of the column in the polygons sf object that contains unique identifiers for each polygon (default: "polygon_id"). Preferably as string.}
 
-\item{used_NCES}{Boolean indicating whether the user input NCES school district shapefiles or other shapefiles with a state_FIPS code as the polygons (default: TRUE).}
+\item{used_NCES}{Boolean indicating whether the user input NCES school district shapefiles or other shapefiles with a state FIPS_code as the polygons (default: FALSE).}
 
-\item{state_FIPS}{State FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state).}
+\item{FIPS_code}{State FIPS code to filter NCES or other school district shapefiles (default: NULL, which means no filtering by state).}
+
+\item{FIPS_col}{Column name in your dataset containing FIPS_code. Preferably should be a character/string variable (default: NULL, which means no filtering by state).}
 }
 \value{
-A tibble with three columns: point_id, polygon_id, and distance (to internal point), where each point_id is matched to one polygon_id.
+A tibble with three columns: point_id (string), polygon_id (string), and distance (numeric, meters to internal point), where each point_id is matched to one polygon_id.
 }
 \description{
 The \code{overlay()} function performs the "Overlay" (Step 2) operation from the QOR Method.

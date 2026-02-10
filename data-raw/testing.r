@@ -17,6 +17,9 @@ devtools::load_all("~/GitHub/Academic/QOR")
 # Re-compile github website
 pkgdown::build_site("~/GitHub/Academic/QOR")
 
+# Push website to GitHub
+usethis::use_pkgdown_github_pages()
+
 # Load testing data
 test <- haven::read_dta(system.file("example_data", "sample_2022_addresses.dta", package = "QOR"))
 

@@ -13,8 +13,9 @@ recover(
   polygon_id = "polygon_id",
   zip_id = "postalcode",
   state_shape = NULL,
-  used_NCES = TRUE,
-  state_FIPS = NULL
+  used_NCES = FALSE,
+  FIPS_code = NULL,
+  FIPS_col = NULL
 )
 }
 \arguments{
@@ -24,22 +25,24 @@ recover(
 
 \item{zipcodes}{sf object containing zipcode tabulation area geometries (ZCTAs).}
 
-\item{unit_id}{Name of the column in the units dataframe that contains unique identifiers for each unit (default: "unit_id").}
+\item{unit_id}{Name of the column in the units dataframe that contains unique identifiers for each unit (default: "unit_id"). Preferably as string.}
 
 \item{unit_zip}{Name of the column in the units dataframe that contains the zipcodes (default: "postalcode").}
 
-\item{polygon_id}{Name of the column in the polygons sf object that contains unique identifiers for each polygon (default: "polygon_id").}
+\item{polygon_id}{Name of the column in the polygons sf object that contains unique identifiers for each polygon (default: "polygon_id"). Preferably as string.}
 
-\item{zip_id}{Name of the column in the zipcodes sf object that contains unique identifiers for each zipcode (default: "postalcode").}
+\item{zip_id}{Name of the column in the zipcodes sf object that contains unique identifiers for each zipcode (default: "postalcode"). Preferably as string.}
 
 \item{state_shape}{sf object containing the shape of the state (used to filter zipcodes to the state).}
 
-\item{used_NCES}{Boolean indicating whether the user input NCES school district shapefiles or other shapefiles with a state_FIPS code as the polygons (default: TRUE).}
+\item{used_NCES}{Boolean indicating whether the user input NCES school district shapefiles or other shapefiles with a state FIPS_code as the polygons (default: FALSE).}
 
-\item{state_FIPS}{State FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state).}
+\item{FIPS_code}{State FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state).}
+
+\item{FIPS_col}{Column name in your polygons dataset containing FIPS_code. Preferably should be a character/string variable (default: NULL, which means no filtering by state).}
 }
 \value{
-A tibble with five columns: unit_id, polygon_id, postalcode, distance, and a binary flag for matched_byzip, where each unit_id is matched to one polygon_id.
+A tibble with five columns: unit_id (string), polygon_id (string), postalcode (string), distance (numeric, meters), and a binary flag for matched_byzip, where each unit_id is matched to one polygon_id.
 }
 \description{
 The \code{recover()} function performs the "Recover" (Step 3) operation from the QOR Method.
