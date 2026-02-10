@@ -80,7 +80,7 @@ proper citation. Each step corresponds to a function in the QOR package:
 To install the QOR package, use the following code in R:
 
 ``` r
- devtools::install_github("adam-p-shepardson/QOR", dependencies=TRUE)
+ remotes::install_github("adam-p-shepardson/QOR", dependencies=TRUE)
 ```
 
 Please note that installing the `sf` (Pebesma & Bivand, 2023) dependency
