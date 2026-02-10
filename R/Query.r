@@ -5,7 +5,7 @@
 #' This function:
 #' - Assigns longitude and latitude coordinates to units (e.g., voters) based on their street address, city, and state.
 #' - Acts as a wrapper around `tidygeocoder::geocode()`, while also handling additional processing needed for individual voter data and preparing for subsequent QOR Method steps.
-#' - **Note:** This function does not perform any matching to polygons below the state-level or to zip codes; it simply geocodes the addresses.
+#' - **Note:** This function does not perform matching to polygons below the state-level or to zip codes; it simply geocodes the addresses.
 #' - Focuses on the Census geocoding service accessible through the `tidygeocoder` package (we recommend using the "census" method for best results). You will need to modify the code to use different geocoding services.
 #'
 #' @param units Dataframe or tibble containing voter information (must have unique unit_id, street, city, and state columns).
