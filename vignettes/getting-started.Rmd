@@ -156,9 +156,9 @@ test_recover <- recover(
 
 # Why Does This Work?
 
-QOR leverages the fact that voters, school districts, and zip codes are all spatial entities convertable to the same coordinate reference system (CRS). 
+QOR leverages the fact that voters, school districts, and zip codes are all spatial entities convertable to the same coordinate reference system (CRS). The visualization below shows, conceptually, the three different layers. 
 
-The visualization below shows, conceptually, the three different layers. Geocoded voter points from `query()` can be overlaid onto school district polygons used in `overlay()` to identify which voters live in which districts. For unmatched voters, QOR uses zip code polygons in `recover()` as an intermediary spatial unit to help assign voters to districts based on proximity.
+Geocoded voter points from `query()` can be overlaid onto school district polygons used in `overlay()` to identify which voters live in which districts. For unmatched voters, QOR uses zip code polygons in `recover()` as an intermediary spatial unit to help assign voters to districts based on proximity.
 
 ```{r why_it_works, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE}
 

@@ -14,7 +14,7 @@ QOR is a set of interwoven geospatial data management strategies which help addr
 
 1. Query
 
-Leverage the U.S. Census Geocoder (or any Geocoding sevice of your choice) to transform addresses into precise longitude/latitude coordinates. The `query()` function is a wrapper around the excellent _tidygeocoder_ (Cambon et al., 2021) that has been tailored to our specific data. We recommend _tidygeocoder_ for easily geocoding addresses in R, and provide `query()` as a way to demonstrate how users can adapt _tidygeocoder_ for use with voter files.
+Leverage the U.S. Census Geocoder (or any Geocoding sevice of your choice) to transform addresses into precise longitude/latitude coordinates. The `query()` function is a wrapper around the excellent `tidygeocoder::geocode()` (Cambon et al., 2021) that has been tailored to our specific data. We recommend `tidygeocoder` for easily geocoding addresses in R, and provide `query()` as a way to demonstrate how users can adapt `tidygeocoder` for use with voter files.
    
 2. Overlay
 
@@ -39,7 +39,7 @@ To install the QOR package, use the following code in R:
 ```R 
  devtools::install_github("adam-p-shepardson/QOR", dependencies=TRUE)
 ```
-Please note that installing the _sf_ (Pebesma & Bivand, 2023) dependency is more difficult on MacOS and Linux than for Windows. Mac and Linux users may need to follow the instructions here before installing QOR: https://github.com/r-spatial/sf 
+Please note that installing the `sf` (Pebesma & Bivand, 2023) dependency is more difficult on MacOS and Linux than for Windows. Mac and Linux users may need to follow the instructions here before installing QOR: https://github.com/r-spatial/sf 
 
 # Minimal Data Requirements
 
