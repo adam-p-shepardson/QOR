@@ -17,7 +17,7 @@
 #' @param FIPS_code State FIPS code to filter NCES or other school district shapefiles (default: NULL, which means no filtering by state).
 #' @param FIPS_col Column name in your dataset containing FIPS_code. Preferably should be a character/string variable (default: NULL, which means no filtering by state).
 #'
-#' @return A tibble with three columns: point_id (string), polygon_id (string), and distance (numeric, meters to internal point), where each point_id is matched to one polygon_id.
+#' @return A tibble with three columns: point_id (string), polygon_id (string), and distance (based on units CRS; only for points not in just one polygon). Each point_id is matched to one polygon_id.
 #'
 #' @importFrom dplyr filter mutate tibble rename_with slice_min
 #' @importFrom magrittr %>%
@@ -174,8 +174,6 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
   # Recover user's original point_id and polygon_id names
   colnames(districtset)[colnames(districtset) == "point_id"] <- point_id
   colnames(districtset)[colnames(districtset) == "polygon_id"] <- polygon_id
-  # label distance column
-  attr(districtset$distance, "label") <- "Distance (m), point_id to polygon internal point (only exists if point_id not in just one polygon)"
   
   # Return the districtset
   tictoc::toc(log = TRUE) # print full time
