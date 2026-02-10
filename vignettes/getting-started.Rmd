@@ -269,7 +269,7 @@ create_3d_plot <- function(shapefiles, z_offsets, colors, labels, angle_x = 45, 
   )
   
   # Adjust view
-  rgl.viewpoint(theta = angle_x, phi = angle_y, zoom = zoom)
+  view3d(theta = angle_x, phi = angle_y, zoom = zoom)
   
   # Add title
   text3d(x = mean(c(bbox["xmin"], bbox["xmax"]) - 1), 
