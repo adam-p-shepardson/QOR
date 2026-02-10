@@ -1,0 +1,117 @@
+# Recover Failed Point-to-Polygon Matches Using Zipcodes
+
+The `recover()` function performs the "Recover" (Step 3) operation from
+the QOR Method.
+
+## Usage
+
+``` r
+recover(
+  units = NULL,
+  polygons = NULL,
+  zipcodes = NULL,
+  unit_id = "unit_id",
+  unit_zip = "postalcode",
+  polygon_id = "polygon_id",
+  zip_id = "postalcode",
+  state_shape = NULL,
+  used_NCES = FALSE,
+  FIPS_code = NULL,
+  FIPS_col = NULL
+)
+```
+
+## Arguments
+
+- units:
+
+  Dataframe or tibble containing unit information (must have unique
+  unit_id and a zipcode variable).
+
+- polygons:
+
+  sf object containing polygon geometries (e.g., school districts).
+
+- zipcodes:
+
+  sf object containing zipcode tabulation area geometries (ZCTAs).
+
+- unit_id:
+
+  Name of the column in the units dataframe that contains unique
+  identifiers for each unit (default: "unit_id"). Preferably as string.
+
+- unit_zip:
+
+  Name of the column in the units dataframe that contains the zipcodes
+  (default: "postalcode"). Preferably as string. NOTE: users strongly
+  recommended to first compare unit_zip's formatting to the zip_id
+  column in the zipcodes object.
+
+- polygon_id:
+
+  Name of the column in the polygons sf object that contains unique
+  identifiers for each polygon (default: "polygon_id"). Preferably as
+  string.
+
+- zip_id:
+
+  Name of the column in the zipcodes sf object that contains unique
+  identifiers for each zipcode (default: "postalcode"). Preferably as
+  string.
+
+- state_shape:
+
+  sf object containing the shape of the state (used to filter zipcodes
+  to the state).
+
+- used_NCES:
+
+  Boolean indicating whether the user input NCES school district
+  shapefiles or other shapefiles with a state FIPS_code as the polygons
+  (default: FALSE).
+
+- FIPS_code:
+
+  State FIPS code to filter NCES school district shapefiles (default:
+  NULL, which means no filtering by state).
+
+- FIPS_col:
+
+  Column name in your polygons dataset containing FIPS_code. Preferably
+  should be a character/string variable (default: NULL, which means no
+  filtering by state).
+
+## Value
+
+A list with two items: (1) Tibble with five columns: unit_id (string),
+polygon_id (string), postalcode (string), distance (numeric, meters),
+and a binary flag for matched_byzip, where each unit_id is matched to
+one polygon_id. (2) Tibble for units that could not be matched to a
+zipcode (i.e., no recovery possible) with columns for unit_id and
+postalcode.
+
+## Details
+
+This function:
+
+- Assigns units (e.g., voters) to polygon geometries (e.g., school
+  districts) using zipcodes as a spatial crosswalk.
+
+- Requires that all units, polygons, and zipcodes each have a unique
+  identifier column.
+
+- If observations are not unique (e.g., panel data), use only one
+  timepoint per function call (e.g., all voters in one year, then all
+  voters from the next year, etc.).
+
+- Returns a match that assigns **one** polygon to each unit: the polygon
+  whose internal point is closest to the centroid of that unit's
+  zipcode. The function also returns units that could not be matched to
+  a zipcode as a second table.
+
+- Intended for cases where the "Query" operation fails to convert an
+  address to a point geometry.
+
+- To return multiple polygons per unit, you will need to modify the
+  code.

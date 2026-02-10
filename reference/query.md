@@ -1,0 +1,128 @@
+# Geocode Unit (Voter) Addresses to Longitude/Latitude Coordinates
+
+The `query()` function performs the "Query" (Step 1) operation from the
+QOR Method.
+
+## Usage
+
+``` r
+query(
+  units = NULL,
+  unit_id = "unit_id",
+  street = "street",
+  city = "city",
+  state = "state",
+  state_shape = NULL,
+  units_per_batch = 4000,
+  year = NULL,
+  method = "census",
+  sleep_time = 2,
+  unit_zip = "postalcode",
+  max_tries = 15
+)
+```
+
+## Arguments
+
+- units:
+
+  Dataframe or tibble containing voter information (must have unique
+  unit_id, street, city, and state columns).
+
+- unit_id:
+
+  Name of the column in the units dataframe that contains the unique
+  identifiers for each unit (default: "unit_id"). Preferably as string.
+
+- street:
+
+  Name of the column in the units dataframe that contains the street
+  address (default: "street").
+
+- city:
+
+  Name of the column in the units dataframe that contains the city
+  (default: "city").
+
+- state:
+
+  Name of the column in the units dataframe that contains the state
+  (default: "state").
+
+- state_shape:
+
+  sf object containing the shape of the state (used to filter geocoding
+  results to the state, catching errors).
+
+- units_per_batch:
+
+  Number of units to geocode in each batch (default: 4000). Internet
+  connectivity and API limits determine possibility of larger (or
+  smaller) batches. The Census theoretically allows batches of up to
+  10,000 addresses, but we have found that smaller batches are less
+  likely to be rejected by the API.
+
+- year:
+
+  Year of the data (preferably numeric) for use with "census" method.
+  (default: NULL, which throws an error). Program was designed for years
+  2007 through 2025 using the "census" method. Years \<= 2010 will use
+  the 2010 Census database, and years \> 2025 will use the current
+  Census database.
+
+- method:
+
+  Geocoding method to use (default: "census"). See methods from
+  [`tidygeocoder::geocode()`](https://jessecambon.github.io/tidygeocoder/reference/geocode.html).
+  We recommend "census" for best cost (free) and batch geocoding. You
+  may need to adjust parts of code that select outputs if using
+  different method, and not all methods may support the batch coding
+  that we use by default.
+
+- sleep_time:
+
+  Time to pause between batches (default: 2 seconds). Try increasing if
+  you are getting rate-limited by the geocoding service or encountering
+  connection issues.
+
+- unit_zip:
+
+  RECOMMENDED BUT OPTIONAL name of the column in the units dataframe
+  that contains the postal code (default: "postalcode"). Preferably as
+  string. Output will have a postalcode column if provided, but this
+  column will be NA if not provided. "Recover" will NOT be able to match
+  any unmatched units if postalcode not provided here.
+
+- max_tries:
+
+  Number of times to attempt geocoding for each unit if a call to API
+  fails (default: 15). Try increasing if you are getting rate-limited by
+  the geocoding service or encountering connection issues. If a unit
+  fails to geocode after this many attempts, it will be stored as
+  unmatched and the function will move on to the next unit.
+
+## Value
+
+A list with two items: (1) Tibble of matched units with their geocoded
+coordinates, and (2) Tibble of unmatched units (those that could not be
+geocoded).
+
+## Details
+
+This function:
+
+- Assigns longitude and latitude coordinates to units (e.g., voters)
+  based on their street address, city, and state.
+
+- Acts as a wrapper around
+  [`tidygeocoder::geocode()`](https://jessecambon.github.io/tidygeocoder/reference/geocode.html),
+  while also handling additional processing needed for individual voter
+  data and preparing for subsequent QOR Method steps.
+
+- **Note:** This function does not perform matching to polygons below
+  the state-level or to zip codes; it simply geocodes the addresses.
+
+- Focuses on the Census geocoding service accessible through the
+  `tidygeocoder` package (we recommend using the "census" method for
+  best results). You will need to modify the code to use different
+  geocoding services.
