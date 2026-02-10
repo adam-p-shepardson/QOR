@@ -1,18 +1,28 @@
-url: https://adam-p-shepardson.github.io/QOR
+url: https://adam-p-shepardson.github.io/QOR/
 template:
   bootstrap: 5
   bslib:
-    base_font: {google: "Roboto"}
-    heading_font: {google: "Roboto Slab"}
-    code_font: {google: "Google Sans Code"}
-  light-switch: true
+    base_font:
+      google: Roboto
+    heading_font:
+      google: Roboto Slab
+    code_font:
+      google: Google Sans Code
+  light-switch: yes
   theme: github-light
   theme-dark: github-dark
-
 navbar:
   structure:
-    left: [intro, reference, data-setup, getting-started, state-fips, extra-notes]
-    right: [search, github]
+    left:
+    - intro
+    - reference
+    - data-setup
+    - getting-started
+    - state-fips
+    - extra-notes
+    right:
+    - search
+    - github
   components:
     data-setup:
       text: Data Setup
@@ -26,13 +36,11 @@ navbar:
     extra-notes:
       text: Extra Notes
       href: articles/extra-notes.html
-
 reference:
-  - title: "QOR Functions"
-    desc: "Each Step of the QOR Method has its own function:"
-    contents:
-      - query
-      - overlay
-      - recover
-
+- title: QOR Functions
+  desc: 'Each Step of the QOR Method has its own function:'
+  contents:
+  - query
+  - overlay
+  - recover
 
