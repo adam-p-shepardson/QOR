@@ -6,7 +6,7 @@
 #' - Assigns units (e.g., voters) to polygon geometries (e.g., school districts) using zipcodes as a spatial crosswalk.
 #' - Requires that all units, polygons, and zipcodes each have a unique identifier column.
 #' - If observations are not unique (e.g., panel data), use only one timepoint per function call (e.g., all voters in one year, then all voters from the next year, etc.).
-#' - Returns a match that assigns **one** polygon to each unit: the polygon whose internal point is closest to the centroid of that unit's zipcode.
+#' - Returns a match that assigns **one** polygon to each unit: the polygon whose internal point is closest to the centroid of that unit's zipcode. The function also returns units that could not be matched to a zipcode as a second table.
 #' - Intended for cases where the "Query" operation fails to convert an address to a point geometry.
 #' - To return multiple polygons per unit, you will need to modify the code.
 #'
