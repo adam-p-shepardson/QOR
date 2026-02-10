@@ -315,7 +315,7 @@ create_3d_plot <- function(shapefiles, z_offsets, colors, labels, angle_x = 45, 
 create_3d_plot(shapefiles, z_offsets, colors, labels)
 
 # Set the size of the 3D plot window
-rgl::par3d(windowRect = c(0, 0, 1280, 720)  # 1280x720 resolution
+rgl::par3d(windowRect = c(0, 0, 1280, 720))  # 1280x720 resolution
 
 # Capture the 3D plot for HTML output
 rglwidget()
