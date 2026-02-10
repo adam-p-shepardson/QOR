@@ -78,7 +78,7 @@ test_query <- query(
   method = "census",
   sleep_time = 2,
   year = 2022,
-  zip_id = "postalcode",
+  unit_zip = "postalcode",
   max_tries = 15
 )
 

@@ -56,7 +56,6 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
     polygons <- polygons %>%
         sf::st_make_valid() %>%
         sf::st_transform(., crs = sf::st_crs(points)) # sets the two objects to the same coordinate reference system.
-    polygons_internal <- sf::st_point_on_surface(polygons) # creates a point on the internal surface of each polygon, which is used to calculate distances to ids
 
     # Convert custom names to standard names
     colnames(points)[colnames(points) == point_id] <- "point_id" 
@@ -90,9 +89,9 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
   tictoc::tic("Runtime: Point-Polygon Distance Calculation") # Start time for distance calculations
   
   ## For every id, filter down to the polygon that they are in. If they truly straddle the line between two, use the closest one (based on internal point)
-  # Store all intersections for use in loop
-  intersections <- sf::st_intersects(points, polygons) 
-  
+  intersections <- sf::st_intersects(points, polygons) # store all intersections 
+  polygons_internal <- sf::st_point_on_surface(polygons) # creates a point on the internal surface of each polygon, which is used to calculate distances to ids
+
   # I only need the distances for ids who are in no or multiple polygons
   # Inspired by: https://gis.stackexchange.com/questions/394954/r-using-st-intersects-to-classify-points-inside-outside-and-within-a-buffer
   in_onedistrict <- lengths(intersections) == 1 # point intersects one polygon
@@ -121,8 +120,12 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
   distances$distance <- as.numeric(distances$distance) # remove units so that minimum calculation works. Note: all values still in m (meters) by default
 
   # Print the point_ids for any points in multiple or no polygons
-  message(paste0("These point_ids were in multiple polygons:", as.character(in_multipledistricts)))
-  message(paste0("These point_ids were in no polygons:", as.character(in_nodistricts)))
+  if(length(in_multipledistricts) > 0) {
+    message(paste0("These point_ids were in multiple polygons: ", paste0(in_multipledistricts, collapse = ", ")))
+  }
+  if(length(in_nodistricts) > 0) {
+    message(paste0("These point_ids were in no polygons: ", paste0(in_nodistricts, collapse = ", ")))
+  }
   
   tictoc::toc(log = TRUE) # print Point-Polygon Distance calculation time
   

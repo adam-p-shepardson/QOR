@@ -15,7 +15,7 @@ query(
   year = NULL,
   method = "census",
   sleep_time = 2,
-  zip_id = "postalcode",
+  unit_zip = "postalcode",
   max_tries = 15
 )
 }
@@ -40,7 +40,7 @@ query(
 
 \item{sleep_time}{Time to pause between batches (default: 2 seconds). Try increasing if you are getting rate-limited by the geocoding service or encountering connection issues.}
 
-\item{zip_id}{RECOMMENDED BUT OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Preferably as string. Output will have a postalcode column if provided, but this column will be NA if not provided. "Recover" will NOT be able to match any unmatched units if postalcode not provided here.}
+\item{unit_zip}{RECOMMENDED BUT OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Preferably as string. Output will have a postalcode column if provided, but this column will be NA if not provided. "Recover" will NOT be able to match any unmatched units if postalcode not provided here.}
 
 \item{max_tries}{Number of times to attempt geocoding for each unit if a call to API fails (default: 15). Try increasing if you are getting rate-limited by the geocoding service or encountering connection issues. If a unit fails to geocode after this many attempts, it will be stored as unmatched and the function will move on to the next unit.}
 }

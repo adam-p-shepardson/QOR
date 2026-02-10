@@ -6,6 +6,7 @@
 
 # Path
 local_path <- "~/GitHub/Academic/QOR/"
+library(tidyverse)
 
 # Download necessary files for testing (too big to store on GitHub)
 source(paste0(local_path, "data-raw/download_data.r"))
@@ -31,7 +32,7 @@ district_shape <- sf::read_sf(dsn = paste0(local_path, "data-raw/Extracted/SCHOO
 
 # Query test
 test_query <- query(
-  units = example,
+  units = test,
   unit_id = "statevoterid",
   street = "street",
   city = "city",
@@ -40,13 +41,14 @@ test_query <- query(
   units_per_batch = 4000,
   method = "census",
   sleep_time = 2,
-  year = 2022,
-  zip_id = "postalcode",
+  year = 2025,
+  unit_zip = "postalcode",
   max_tries = 15
 )
 
 matched <- test_query[[1]]
 unmatched <- test_query[[2]]
+overlap <- dplyr::filter(matched, statevoterid %in% unmatched$statevoterid)
 
 # Overlay test
 test_overlay <- overlay(
@@ -58,6 +60,8 @@ test_overlay <- overlay(
   FIPS_code = "37",
   FIPS_col = "STATEFP"
 )
+
+dist_matched <- dplyr::filter(test_overlay, !is.na(distance))
 
 # Recover test
 test_recover <- recover(

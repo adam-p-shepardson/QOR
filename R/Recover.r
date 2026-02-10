@@ -87,8 +87,8 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
             units$postalcode <- as.character(units$postalcode)
         }
         colnames(polygons)[colnames(polygons) == polygon_id] <- "polygon_id"
-        if (!is.character(polygons$state_fips)) {
-          polygons$state_fips <- as.character(polygons$state_fips)
+        if (!is.character(polygons$polygon_id)) {
+          polygons$polygon_id <- as.character(polygons$polygon_id)
         }
         colnames(zipcodes)[colnames(zipcodes) == zip_id] <- "postalcode"
         if (!is.character(zipcodes$postalcode)) {
@@ -150,8 +150,10 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
   ## Assign the recovered units to the closest polygon to zip centroid (based on internal point)
   for(uid in all_ids) {
     id_count <- id_count + 1
-    message(paste0("Now attempting to assign a polygon (based on zipcode) to unit ", as.character(id_count), " out of the ", as.character(length(all_ids)), " units who could not be geocoded"))
-    
+      if (id_count %% 1000 == 0) { # progress update every 1000 ids
+        message(paste0("Now attempting to assign a polygon (based on zipcode) to unit ", as.character(id_count), " out of the ", as.character(length(all_ids)), " units who could not be geocoded"))
+      }
+
     # Get the unit's postalcode
     temp <- units %>% 
       filter(., unit_id == uid)

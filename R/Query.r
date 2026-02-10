@@ -18,7 +18,7 @@
 #' @param units_per_batch Number of units to geocode in each batch (default: 4000). Internet connectivity and API limits determine possibility of larger (or smaller) batches. The Census theoretically allows batches of up to 10,000 addresses, but we have found that smaller batches are less likely to be rejected by the API.
 #' @param method Geocoding method to use (default: "census"). See methods from tidygeocoder::geocode(). We recommend "census" for best cost (free) and batch geocoding. You may need to adjust parts of code that select outputs if using different method, and not all methods may support the batch coding that we use by default.
 #' @param sleep_time Time to pause between batches (default: 2 seconds). Try increasing if you are getting rate-limited by the geocoding service or encountering connection issues.
-#' @param zip_id RECOMMENDED BUT OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Preferably as string. Output will have a postalcode column if provided, but this column will be NA if not provided. "Recover" will NOT be able to match any unmatched units if postalcode not provided here.
+#' @param unit_zip RECOMMENDED BUT OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Preferably as string. Output will have a postalcode column if provided, but this column will be NA if not provided. "Recover" will NOT be able to match any unmatched units if postalcode not provided here.
 #' @param max_tries Number of times to attempt geocoding for each unit if a call to API fails (default: 15). Try increasing if you are getting rate-limited by the geocoding service or encountering connection issues. If a unit fails to geocode after this many attempts, it will be stored as unmatched and the function will move on to the next unit.
 #'
 #' @return A list with two items: (1) Tibble of matched units with their geocoded coordinates, and (2) Tibble of unmatched units (those that could not be geocoded).
@@ -30,7 +30,7 @@
 #' @importFrom sf st_as_sf st_crs st_transform st_make_valid st_filter read_sf st_drop_geometry
 #' @export
 query <- function(units = NULL, unit_id = "unit_id", street = "street", city = "city", state = "state", state_shape = NULL, 
-units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id = "postalcode", max_tries = 15) {
+units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, unit_zip = "postalcode", max_tries = 15) {
 
     tictoc::tic.clearlog() # clear time log as safety check
     tictoc::tic("Runtime: Query Full Time") # Start timer for the entire recover process
@@ -62,8 +62,8 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id =
         colnames(units)[colnames(units) == city] <- "cty"
         colnames(units)[colnames(units) == state] <- "ste"
         
-        if(!is.null(zip_id) && zip_id %in% names(units)) { 
-            colnames(units)[colnames(units) == zip_id] <- "postalcode"
+        if(!is.null(unit_zip) && unit_zip %in% names(units)) { 
+            colnames(units)[colnames(units) == unit_zip] <- "postalcode"
             if(!is.character(units$postalcode)) {
                 units$postalcode <- as.character(units$postalcode)
             }
@@ -247,7 +247,7 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id =
     }
 
     # Retain only relevant columns
-    if(!is.null(zip_id) && zip_id %in% names(units)) { 
+    if(!is.null(unit_zip) && unit_zip %in% names(units)) { 
         coord <- coord[, c("unit_id", "str", "cty", "ste", "postalcode", "geometry")]
         still_unmatched <- still_unmatched[, c("unit_id", "str", "cty", "ste", "postalcode")]
     } else {
@@ -260,9 +260,9 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, zip_id =
     colnames(coord)[colnames(coord) == "str"] <- street
     colnames(coord)[colnames(coord) == "cty"] <- city
     colnames(coord)[colnames(coord) == "ste"] <- state
-    if(!is.null(zip_id) && zip_id %in% names(units)) { 
-        colnames(coord)[colnames(coord) == "postalcode"] <- zip_id
-        colnames(still_unmatched)[colnames(still_unmatched) == "postalcode"] <- zip_id
+    if(!is.null(unit_zip) && unit_zip %in% names(units)) { 
+        colnames(coord)[colnames(coord) == "postalcode"] <- unit_zip
+        colnames(still_unmatched)[colnames(still_unmatched) == "postalcode"] <- unit_zip
     }
     colnames(still_unmatched)[colnames(still_unmatched) == "unit_id"] <- unit_id
     colnames(still_unmatched)[colnames(still_unmatched) == "str"] <- street
