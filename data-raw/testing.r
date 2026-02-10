@@ -1,7 +1,7 @@
 # Metadata ----
 # Authors: Adam Shepardson
 # Contact: apshepardson@albany.edu
-# Date Last Edited: 01/30/2026
+# Date Last Edited: 02/10/2026
 # Purpose: Test QOR package functions
 
 # Path
@@ -27,17 +27,46 @@ zip_shape <- sf::read_sf(dsn = paste0(local_path, "data-raw/Extracted/ZIP_2022")
 district_shape <- sf::read_sf(dsn = paste0(local_path, "data-raw/Extracted/SCHOOL_SY2022"))
 
 # Query test
-test_query <- query(units = test, unit_id = "statevoterid", street = "street", city = "city",
-    state = "state", state_shape = state_shape, year = 2022, zip_id = "postalcode")
+test_query <- query(
+  units = example,
+  unit_id = "statevoterid",
+  street = "street",
+  city = "city",
+  state = "state",
+  state_shape = state_shape,
+  units_per_batch = 4000,
+  method = "census",
+  sleep_time = 2,
+  year = 2022,
+  zip_id = "postalcode",
+  max_tries = 15
+)
 
 matched <- test_query[[1]]
 unmatched <- test_query[[2]]
 
 # Overlay test
-test_overlay <- overlay(points = matched, polygons = district_shape, point_id = "statevoterid", 
-polygon_id = "GEOID", used_NCES = TRUE, state_FIPS = "37")
+test_overlay <- overlay(
+  points = matched,
+  polygons = district_shape,
+  point_id = "statevoterid",
+  polygon_id = "GEOID",
+  used_NCES = TRUE,
+  FIPS_code = "37",
+  FIPS_col = "STATEFP"
+)
 
 # Recover test
-test_recover <- recover(units = unmatched, polygons = district_shape, zipcodes = zip_shape,
- unit_id = "statevoterid", unit_zip = "postalcode", polygon_id = "GEOID", zip_id = "ZCTA5CE20",
- state_shape = state_shape, used_NCES = TRUE, state_FIPS = "37")
+test_recover <- recover(
+  units = unmatched,
+  polygons = district_shape,
+  zipcodes = zip_shape,
+  unit_id = "statevoterid",
+  unit_zip = "postalcode",
+  polygon_id = "GEOID",
+  zip_id = "ZCTA5CE20",
+  state_shape = state_shape,
+  used_NCES = TRUE,
+  FIPS_code = "37",
+  FIPS_col = "STATEFP"
+)
