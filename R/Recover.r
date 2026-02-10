@@ -39,7 +39,7 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
     tictoc::tic("Runtime: Recover Full Time") # Start timer for the entire recover process
 
     # Check that the inputs are valid
-    if (is.null(units) || is.null(polygons) || is.null(zipcodes) || is.null(state_shape)) {
+    if (is.null(units) || is.null(polygons) || is.null(zipcodes) || is.null(state_shape) || nrow(units) == 0 || nrow(polygons) == 0 || nrow(zipcodes) == 0) {
         stop("The units dataset, polygons shapefile, zipcodes shapefile, and a state shapefile must all be provided.")
     } else if (!is.data.frame(units)) {
         stop("Units must be a data.frame or tibble object.")

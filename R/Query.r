@@ -36,7 +36,7 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, unit_zip
     tictoc::tic("Runtime: Query Full Time") # Start timer for the entire recover process
 
     # Check that the inputs are valid
-    if (is.null(units) || is.null(street) || is.null(city) || is.null(state) || is.null(state_shape) || is.null(unit_id)) {
+    if (is.null(units) || is.null(street) || is.null(city) || is.null(state) || is.null(state_shape) || is.null(unit_id) || nrow(units) == 0) {
         stop("The units dataset with column names for street, city, state, and unique unit_id, as well as a state shapefile, must all be provided.")
     } else if (!is.data.frame(units)) {
         stop("Units must be a data.frame or tibble object.")

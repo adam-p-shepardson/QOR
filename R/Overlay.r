@@ -33,7 +33,7 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
   tictoc::tic("Runtime: Overlay Full Time") # Start full timer for function
 
   # Check that the inputs are valid
-  if (is.null(points) || is.null(polygons)) {
+  if (is.null(points) || is.null(polygons) || nrow(points) == 0 || nrow(polygons) == 0) {
     stop("Both points and polygons must be provided.")
   } else if (!inherits(points, "sf") || !inherits(polygons, "sf")) {
     stop("Both points and polygons must be sf objects (convert to sf format using functions from sf package).")
