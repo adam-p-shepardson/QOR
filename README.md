@@ -6,7 +6,7 @@ The QOR package contains functions for implementing the Query, Overlay, Recover 
 
 Please cite our work as follows:
 
-Shepardson, A., Lyon, M., Schueler, B., & Bleiberg, J. (2026). QOR: Functions to Identify 'Who Can Vote' in 'What School District' (Version 0.9.0.0) [Computer software]. https://adam-p-shepardson.github.io/QOR
+Shepardson, A., Lyon, M., Schueler, B., & Bleiberg, J. (2026). QOR: Functions to Identify Who Can Vote in What School District (Version 0.9.0.0) [Computer software]. https://adam-p-shepardson.github.io/QOR
 
 # Query, Overlay, Recover
 

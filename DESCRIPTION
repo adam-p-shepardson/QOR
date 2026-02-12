@@ -8,7 +8,7 @@ Authors@R: c(
     person("Joshua", "Bleiberg", , "jbleiber@pitt.edu", role = c("ctb")))
 Description: Matching point geometries (e.g., voter locations) to polygon geometries (e.g., school districts) 
     using spatial intersections and distances. The package implements the "Query, Overlay, Recover" (QOR) method from Shepardson et al. (2026), 
-    which is a three-step process to identify which voters live in which school districts. QOR may be generalizable to
+    which is a three-step process to identify which voters live in what school district. QOR may be generalizable to
     other sets of point and polygon geometries, although the package is currently designed for education research applications. 
 License: MIT + file LICENSE
 Encoding: UTF-8
