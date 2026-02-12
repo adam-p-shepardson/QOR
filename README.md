@@ -39,7 +39,7 @@ To install the QOR package, use the following code in R:
 ```R 
  remotes::install_github("adam-p-shepardson/QOR", dependencies=TRUE)
 ```
-Please note that installing the `sf` (Pebesma & Bivand, 2023) dependency is more difficult on MacOS and Linux than for Windows. Mac and Linux users may need to follow the instructions here before installing QOR: https://github.com/r-spatial/sf 
+Please note that our package requires several dependencies (other R packages) which the line above attempts to install. However, installing the `sf` (Pebesma & Bivand, 2023) dependency is more difficult on MacOS and Linux than for Windows. Mac and Linux users may need to follow the instructions here before installing QOR: https://github.com/r-spatial/sf 
 
 # Minimal Data Requirements
 
