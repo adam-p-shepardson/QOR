@@ -12,7 +12,7 @@ further detail the process with applied examples in a forthcoming paper.
 Please cite our work as follows:
 
 Shepardson, A., Lyon, M., Schueler, B., & Bleiberg, J. (2026). QOR:
-Functions to Identify ‘Who Can Vote’ in ‘What School District’ (Version
+Functions to Identify Who Can Vote in What School District (Version
 0.9.0.0) \[Computer software\].
 <https://adam-p-shepardson.github.io/QOR>
 
@@ -83,9 +83,11 @@ To install the QOR package, use the following code in R:
  remotes::install_github("adam-p-shepardson/QOR", dependencies=TRUE)
 ```
 
-Please note that installing the `sf` (Pebesma & Bivand, 2023) dependency
-is more difficult on MacOS and Linux than for Windows. Mac and Linux
-users may need to follow the instructions here before installing QOR:
+Please note that our package requires several dependencies (other R
+packages) which the line above attempts to install. However, installing
+the `sf` (Pebesma & Bivand, 2023) dependency is more difficult on MacOS
+and Linux than for Windows. Mac and Linux users may need to follow the
+instructions here before installing QOR:
 <https://github.com/r-spatial/sf>
 
 # Minimal Data Requirements

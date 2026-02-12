@@ -56,7 +56,7 @@ test_query <- query(
   unit_zip = "postalcode",
   max_tries = 15
 )
-#> Runtime: Query Full Time: 1862.547 sec elapsed
+#> Runtime: Query Full Time: 1763.157 sec elapsed
 
 matched <- test_query[[1]]    # Successfully geocoded (use for Overlay)
 unmatched <- test_query[[2]]  # Failed to geocode (use for Recover)
