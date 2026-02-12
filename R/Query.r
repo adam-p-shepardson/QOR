@@ -131,7 +131,7 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, unit_zip
         message(paste0("Now batch-geocoding unit group ", as.character(num), " out of ", as.character(unitgroups)))
     
         if(num == 1) {
-            # I decided not to input postalcodes into the Census geocoder, as I know these change over time. The matched_address should ultimately give me the current postalcode based on the vintage (I think)
+            # I decided not to input postalcodes into the Census geocoder, as I know these change over time.
             coord <- sample_list[[num]] %>%
                 tidygeocoder::geocode(street = str, city = cty, state = ste, method = mthd, lat = latitude, long = longitude,
                     full_results = TRUE, verbose = TRUE, mode = "batch", custom_query = list(vintage = vin),

@@ -111,7 +111,7 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
         # Filter down to state FIPS code if user is providing FIPS
         if (!is.null(FIPS_code) & !is.null(FIPS_col)) {
           polygons <- polygons %>%
-          dplyr::filter(., .data$state_fips == as.character(FIPS_code)) # filters polygons to the state FIPS code
+          dplyr::filter(., .data$state_fips == as.character(FIPS_code))
         } 
     }
   
@@ -133,7 +133,7 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
   # Tidy the distances dataset
   statedistances <- tibble::rownames_to_column(statedistances, "postalcode") %>%
     tidyr::pivot_longer(cols = !postalcode, names_to = "polygon_id", values_to = "distance") 
-  statedistances$distance <- as.numeric(statedistances$distance) # remove units so that minimum calculation works. Note: all values still in m (meters)
+  statedistances$distance <- as.numeric(statedistances$distance) 
   
   tictoc::toc(log = TRUE) # store distances time
   

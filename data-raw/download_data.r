@@ -3,8 +3,6 @@
 # Contact: apshepardson@albany.edu
 # Date Last Edited: 1/29/2026
 # Purpose: Download files and Create Small Sample of Voter Addresses for Package Testing
-# Note: In our case, NC and WA both did not change their # of public school districts within the panel years, and even border adjustments during each panel's years were minimal according to NCES records. 
-# For other states and/or time ranges, more caution about which years are used for the school district shapes is likely warranted
 
 # Load relevant packages -----
 library(tidyverse) # best practices for handling data in R
@@ -17,7 +15,7 @@ library(RStata) # for running Stata from R
 local_path <- "~/GitHub/Academic/QOR/"
 
 ## Pre-anonymize and Sample Voter data ---- 
-# To replicate this step, find NC voter registration data online for yourself. The _orig file here is not publicly available.
+# To replicate this step, find public NC voter registration data online for yourself. The extracts_orig file here is not stored anymore.
 set.seed(5)
 extracts_orig <- "https://www.dropbox.com/scl/fi/ayb9s98b5tzr3hfo28baj/Example-Extracts.zip?rlkey=bq5pvd4i8y1mxvnmxnapo27bb&st=q4hg1lmv&dl=1"
 download.file(url = extracts_orig, destfile = paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), mode = "wb", method = "auto")

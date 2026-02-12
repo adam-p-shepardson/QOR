@@ -137,13 +137,13 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
   id_count <- 0
   
   # For loops
-    for(vid in in_onedistrict) { # Vast majority of, if not all, cases: Check if in one polygon. Extract that pid.
+    for(vid in in_onedistrict) { # Vast majority of, if not all, cases: Check if in one polygon. Extract that polygon_id.
       # Ticker
       id_count <- id_count + 1
         if (id_count %% 1000 == 0) { # progress update every 1000 ids
           message(paste0("Now assigning a polygon to point_id # ", as.character(id_count), " out of the ", as.character(length(in_onedistrict)), " point_id's in only one polygon"))
         }
-      # Find row # in points for point_id, then feed this row # into intersections to get row # of overlapping polygon in polygons, then feed this row # into polygons$pid to get pid, then store in districtset.
+      # Find row # in points for point_id, then feed this row # into intersections to get row # of overlapping polygon in polygons, then feed this row # into polygons$pid to get polygon_id, then store in districtset.
       districtset$polygon_id[districtset$point_id == vid] <- polygons$polygon_id[intersections[[which(points$point_id == vid)]]]
     } 
     for(vid in in_multipledistricts) { # If in several districts, only extract closest *of these*

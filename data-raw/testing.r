@@ -15,11 +15,10 @@ source(paste0(local_path, "data-raw/download_data.r"))
 devtools::document("~/GitHub/Academic/QOR")
 devtools::load_all("~/GitHub/Academic/QOR")
 
-# Re-compile github website
+# Re-compile github website (local testing)
 pkgdown::build_site("~/GitHub/Academic/QOR")
 
 # Push website to GitHub
-usethis::proj_set("~/GitHub/Academic/QOR")
 usethis::use_pkgdown_github_pages()
 
 # Load testing data
