@@ -2,16 +2,16 @@
 
 ## State FIPS Code Reference
 
-FIPS (Federal Information Processing Standards) codes are necessary for
-the QOR method to work when using NCES shapefiles. The
+The
 [`overlay()`](https://adam-p-shepardson.github.io/QOR/reference/overlay.md)
 and
 [`recover()`](https://adam-p-shepardson.github.io/QOR/reference/recover.md)
 functions can use the `FIPS_code` parameter to filter school districts
-if working with the national NCES district shapefiles.
+by state FIPS (Federal Information Processing Standards) codes if
+working with the national NCES district shapefiles.
 
-The table below provides a complete mapping of 50 U.S. state two-letter
-abbreviations to their FIPS codes per the [Bureau of Labor
+The table below maps the 50 U.S. state two-letter abbreviations to their
+FIPS codes per the [Bureau of Labor
 Statistics](https://www.bls.gov/respondents/mwr/electronic-data-interchange/appendix-d-usps-state-abbreviations-and-fips-codes.htm):
 
 | FIPS | Abbreviation | State          |
