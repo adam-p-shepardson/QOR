@@ -163,7 +163,7 @@ test_recover <- recover(
 )
 
 matched_byzip <- test_recover[[1]]    # Successfully matched to a district by zipcode
-no_zip <- test_query[[2]]  # Failed to map unit zip code to a Census-recognized zip code for that year
+no_zip <- test_recover[[2]]  # Failed to map unit zip code to a Census-recognized zip code for that year
 
 ```
 
