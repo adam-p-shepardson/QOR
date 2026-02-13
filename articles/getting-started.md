@@ -56,7 +56,7 @@ test_query <- query(
   unit_zip = "postalcode",
   max_tries = 15
 )
-#> Runtime: Query Full Time: 1763.157 sec elapsed
+#> Runtime: Query Full Time: 1764.85 sec elapsed
 
 matched <- test_query[[1]]    # Successfully geocoded (use for Overlay)
 unmatched <- test_query[[2]]  # Failed to geocode (use for Recover)
@@ -138,7 +138,7 @@ test_recover <- recover(
 )
 
 matched_byzip <- test_recover[[1]]    # Successfully matched to a district by zipcode
-no_zip <- test_query[[2]]  # Failed to map unit zip code to a Census-recognized zip code for that year
+no_zip <- test_recover[[2]]  # Failed to map unit zip code to a Census-recognized zip code for that year
 ```
 
 ## Why Does This Work?

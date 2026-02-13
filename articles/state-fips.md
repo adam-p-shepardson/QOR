@@ -7,8 +7,8 @@ the QOR method to work when using NCES shapefiles. The
 [`overlay()`](https://adam-p-shepardson.github.io/QOR/reference/overlay.md)
 and
 [`recover()`](https://adam-p-shepardson.github.io/QOR/reference/recover.md)
-functions require the `state_FIPS` parameter to correctly filter school
-districts.
+functions can use the `FIPS_code` parameter to filter school districts
+if working with the national NCES district shapefiles.
 
 The table below provides a complete mapping of 50 U.S. state two-letter
 abbreviations to their FIPS codes per the [Bureau of Labor

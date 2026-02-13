@@ -3,12 +3,12 @@
 ## Computing Environments
 
 The data employed in our paper used a conda environment that installed R
-version 4.2.0 (the most recent R version compatible with the cloud
-computing system of the lead author’s university) and the required
-dependencies simultaneously. Scripts to match voters to school districts
-were originally run on Linux-based machines. Please note that, broadly
-speaking, many voter files are large and some use cases may require
-significant computing power.
+version 4.2.0 (the most recent R version compatible with the
+high-performance computing system of the lead author’s university) and
+the required dependencies simultaneously. Scripts to match voters to
+school districts were originally run on Linux-based machines. Please
+note that, broadly speaking, many voter files are large and some use
+cases may require significant computing power.
 
 Evaluate the size of your data and the computing power available to you
 before running code. Academic audiences may not be aware that R
