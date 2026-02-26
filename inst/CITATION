@@ -7,7 +7,7 @@ bibentry(
     person("Beth", "Schueler", email = "bschu@stanford.edu", role = "ctb"),
     person("Joshua", "Bleiberg", email = "jbleiber@pitt.edu", role = "ctb")
   ),
-  year     = format(Sys.Date(), "%Y"),
+  year     = "2026",
   note     = sprintf("R package version %s", meta$Version),
   url      = "https://adam-p-shepardson.github.io/QOR",
   textVersion = paste(
