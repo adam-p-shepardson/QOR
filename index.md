@@ -5,16 +5,17 @@ Recover (QOR) method, which links analytically useful administrative
 boundaries with the individual voter files that many U.S. states produce
 at little to no cost. We introduced QOR during a paper presentation at
 the 2025 Association for Education Finance and Policy Conference, and
-further detail the process with applied examples in a forthcoming paper.
+further detail the process in our working paper (see below).
 
 # Citation
 
 Please cite our work as follows:
 
-Shepardson, A., Lyon, M., Schueler, B., & Bleiberg, J. (2026). QOR:
-Functions to Identify Who Can Vote in What School District (Version
-0.9.0.0) \[Computer software\].
-<https://adam-p-shepardson.github.io/QOR>
+Shepardson, Adam, Melissa Arnold Lyon, Beth E. Schueler, and Joshua
+Bleiberg. (2026). Capturing Voter Turnout at the School District Level:
+Validating a Geospatial Strategy. (EdWorkingPaper: 26-1401). Retrieved
+from Annenberg Institute at Brown University:
+<https://doi.org/10.26300/bmh1-xr32>
 
 # Query, Overlay, Recover
 

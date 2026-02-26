@@ -17,9 +17,11 @@
 Source:
 [`inst/CITATION`](https://github.com/adam-p-shepardson/QOR/blob/main/inst/CITATION)
 
-Shepardson, A., Lyon, M., Schueler, B., & Bleiberg, J. (2026). QOR:
-Functions to Identify Who Can Vote in What School District (Version
-0.9.0.0) \[Computer software\]. https://adam-p-shepardson.github.io/QOR
+Shepardson, Adam, Melissa Arnold Lyon, Beth E. Schueler, and Joshua
+Bleiberg. (2026). Capturing Voter Turnout at the School District Level:
+Validating a Geospatial Strategy. (EdWorkingPaper: 26-1401). Retrieved
+from Annenberg Institute at Brown University:
+https://doi.org/10.26300/bmh1-xr32
 
     @Manual{,
       title = {{QOR}: Functions to Identify Who Can Vote in What School District},

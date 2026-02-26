@@ -51,12 +51,12 @@ state_shape <- "https://www.dropbox.com/scl/fi/a8bn3ht1d67xd412zixf5/North_Carol
 district_shapes <- "https://www.dropbox.com/scl/fi/eh557z55pg9051dq4mves/SCHOOL_SY2022.zip?rlkey=ds8a7pocgj7evgsmvhsn9dyow&st=tecyt8yc&dl=1"
 
 # Download shapefiles
-download.file(url = zip_codes, destfile = paste0(local_path, "data-raw/Downloads/zip_codes_2022.zip"), mode = "wb", method = "auto")
-unzip(zipfile = paste0(local_path, "data-raw/Downloads/zip_codes_2022.zip"), exdir = paste0(local_path, "data-raw/Extracted"))
-download.file(url = state_shape, destfile = paste0(local_path, "data-raw/Downloads/state_shape.zip"), mode = "wb", method = "auto")
-unzip(zipfile = paste0(local_path, "data-raw/Downloads/state_shape.zip"), exdir = paste0(local_path, "data-raw/Extracted"))
-download.file(url = district_shapes, destfile = paste0(local_path, "data-raw/Downloads/district_shapes_2022.zip"), mode = "wb", method = "auto")
-unzip(zipfile = paste0(local_path, "data-raw/Downloads/district_shapes_2022.zip"), exdir = paste0(local_path, "data-raw/Extracted")) 
+download.file(url = zip_codes, destfile = paste0(local_path, "/data-raw/Downloads/zip_codes_2022.zip"), mode = "wb", method = "auto")
+unzip(zipfile = paste0(local_path, "/data-raw/Downloads/zip_codes_2022.zip"), exdir = paste0(local_path, "/data-raw/Extracted"))
+download.file(url = state_shape, destfile = paste0(local_path, "/data-raw/Downloads/state_shape.zip"), mode = "wb", method = "auto")
+unzip(zipfile = paste0(local_path, "/data-raw/Downloads/state_shape.zip"), exdir = paste0(local_path, "/data-raw/Extracted"))
+download.file(url = district_shapes, destfile = paste0(local_path, "/data-raw/Downloads/district_shapes_2022.zip"), mode = "wb", method = "auto")
+unzip(zipfile = paste0(local_path, "/data-raw/Downloads/district_shapes_2022.zip"), exdir = paste0(local_path, "/data-raw/Extracted")) 
 ```
 
 ## Cleaning Addresses
@@ -76,9 +76,9 @@ does not correspond to actual voter IDs.
 
 ``` r
 # Download anonymized voter registration extracts (Taken Jan. 1, 2022)
-download.file(url = extracts, destfile = paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), mode = "wb", method = "auto")
-unzip(zipfile = paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), exdir = paste0(local_path, "data-raw/Extracted"))
-sample_2022 <- haven::read_dta(paste0(local_path, "data-raw/Extracted/Example Extracts/VR_Snapshot_2022_ALL_Anonymized.dta"))
+download.file(url = extracts, destfile = paste0(local_path, "/data-raw/Downloads/Extracts_2022.zip"), mode = "wb", method = "auto")
+unzip(zipfile = paste0(local_path, "/data-raw/Downloads/Extracts_2022.zip"), exdir = paste0(local_path, "/data-raw/Extracted"))
+sample_2022 <- haven::read_dta(paste0(local_path, "/data-raw/Extracted/Example Extracts/VR_Snapshot_2022_ALL_Anonymized.dta"))
 
 # View a few raw observations
 print(head(sample_2022, n = 10))
@@ -122,7 +122,7 @@ programming language.
 # We call an external Stata .do file (available on GitHub) for simplicity:
 library(RStata)
 options("RStata.StataPath" = "/usr/local/stata19/stata-se") # Path to your Stata executable. Use console version instead of GUI (stata-se instead of xstata-se)
-suppressWarnings(stata(src = paste0(local_path, "data-raw/NCAddresses.do"), stata.version = 19.5, stata.echo = TRUE, 
+suppressWarnings(stata(src = paste0(local_path, "/data-raw/NCAddresses.do"), stata.version = 19.5, stata.echo = TRUE, 
               arguments = shQuote(local_path)))
 
 # Note: The above line requires the RStata package (install.packages("RStata")) and a local installation of Stata

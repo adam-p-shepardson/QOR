@@ -24,12 +24,12 @@ library(QOR)
 example <- haven::read_dta(system.file("example_data", "sample_2022_addresses.dta", package = "QOR"))
 
 # Load shapefiles (see Data Setup vignette for download instructions)
-state_shape <- read_sf(dsn = paste0(local_path, "data-raw/Extracted/North_Carolina_State_Boundary")) %>%
+state_shape <- read_sf(dsn = paste0(local_path, "/data-raw/Extracted/North_Carolina_State_Boundary")) %>%
   dplyr::summarize(geometry = st_union(geometry)) %>%
   st_make_valid()
-zip_shape <- sf::read_sf(dsn = paste0(local_path, "data-raw/Extracted/ZIP_2022")) %>%
+zip_shape <- sf::read_sf(dsn = paste0(local_path, "/data-raw/Extracted/ZIP_2022")) %>%
   st_make_valid()
-district_shape <- sf::read_sf(dsn = paste0(local_path, "data-raw/Extracted/SCHOOL_SY2022")) %>%
+district_shape <- sf::read_sf(dsn = paste0(local_path, "/data-raw/Extracted/SCHOOL_SY2022")) %>%
   st_make_valid()
 ```
 
@@ -56,7 +56,7 @@ test_query <- query(
   unit_zip = "postalcode",
   max_tries = 15
 )
-#> Runtime: Query Full Time: 1750.409 sec elapsed
+#> Runtime: Query Full Time: 1725.646 sec elapsed
 
 matched <- test_query[[1]]    # Successfully geocoded (use for Overlay)
 unmatched <- test_query[[2]]  # Failed to geocode (use for Recover)
