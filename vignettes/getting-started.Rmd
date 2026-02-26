@@ -14,11 +14,11 @@ here::i_am(".here")
 local_path <- here::here() 
 
 # create the data-raw/Downloads and data-raw/Extracted folders if they don't exist
-if (!dir.exists(paste0(here::here(), "data-raw/Downloads"))) {
-  dir.create(paste0(here::here(), "data-raw/Downloads"), recursive = TRUE)
+if (!dir.exists(paste0(here::here(), "/data-raw/Downloads"))) {
+  dir.create(paste0(here::here(), "/data-raw/Downloads"), recursive = TRUE)
 }
-if (!dir.exists(paste0(here::here(), "data-raw/Extracted"))) {
-  dir.create(paste0(here::here(), "data-raw/Extracted"), recursive = TRUE)
+if (!dir.exists(paste0(here::here(), "/data-raw/Extracted"))) {
+  dir.create(paste0(here::here(), "/data-raw/Extracted"), recursive = TRUE)
 }
 
 # Increase timeout for large files
@@ -30,12 +30,12 @@ state_shape <- "https://www.dropbox.com/scl/fi/a8bn3ht1d67xd412zixf5/North_Carol
 district_shapes <- "https://www.dropbox.com/scl/fi/eh557z55pg9051dq4mves/SCHOOL_SY2022.zip?rlkey=ds8a7pocgj7evgsmvhsn9dyow&st=tecyt8yc&dl=1"
 
 # Download shapefiles
-download.file(url = zip_codes, destfile = paste0(local_path, "data-raw/Downloads/zip_codes_2022.zip"), mode = "wb", method = "auto")
-unzip(zipfile = paste0(local_path, "data-raw/Downloads/zip_codes_2022.zip"), exdir = paste0(local_path, "data-raw/Extracted"))
-download.file(url = state_shape, destfile = paste0(local_path, "data-raw/Downloads/state_shape.zip"), mode = "wb", method = "auto")
-unzip(zipfile = paste0(local_path, "data-raw/Downloads/state_shape.zip"), exdir = paste0(local_path, "data-raw/Extracted"))
-download.file(url = district_shapes, destfile = paste0(local_path, "data-raw/Downloads/district_shapes_2022.zip"), mode = "wb", method = "auto")
-unzip(zipfile = paste0(local_path, "data-raw/Downloads/district_shapes_2022.zip"), exdir = paste0(local_path, "data-raw/Extracted")) 
+download.file(url = zip_codes, destfile = paste0(local_path, "/data-raw/Downloads/zip_codes_2022.zip"), mode = "wb", method = "auto")
+unzip(zipfile = paste0(local_path, "/data-raw/Downloads/zip_codes_2022.zip"), exdir = paste0(local_path, "/data-raw/Extracted"))
+download.file(url = state_shape, destfile = paste0(local_path, "/data-raw/Downloads/state_shape.zip"), mode = "wb", method = "auto")
+unzip(zipfile = paste0(local_path, "/data-raw/Downloads/state_shape.zip"), exdir = paste0(local_path, "/data-raw/Extracted"))
+download.file(url = district_shapes, destfile = paste0(local_path, "/data-raw/Downloads/district_shapes_2022.zip"), mode = "wb", method = "auto")
+unzip(zipfile = paste0(local_path, "/data-raw/Downloads/district_shapes_2022.zip"), exdir = paste0(local_path, "/data-raw/Extracted")) 
 ```
 
 ```{r, include = FALSE}
@@ -63,12 +63,12 @@ library(QOR)
 example <- haven::read_dta(system.file("example_data", "sample_2022_addresses.dta", package = "QOR"))
 
 # Load shapefiles (see Data Setup vignette for download instructions)
-state_shape <- read_sf(dsn = paste0(local_path, "data-raw/Extracted/North_Carolina_State_Boundary")) %>%
+state_shape <- read_sf(dsn = paste0(local_path, "/data-raw/Extracted/North_Carolina_State_Boundary")) %>%
   dplyr::summarize(geometry = st_union(geometry)) %>%
   st_make_valid()
-zip_shape <- sf::read_sf(dsn = paste0(local_path, "data-raw/Extracted/ZIP_2022")) %>%
+zip_shape <- sf::read_sf(dsn = paste0(local_path, "/data-raw/Extracted/ZIP_2022")) %>%
   st_make_valid()
-district_shape <- sf::read_sf(dsn = paste0(local_path, "data-raw/Extracted/SCHOOL_SY2022")) %>%
+district_shape <- sf::read_sf(dsn = paste0(local_path, "/data-raw/Extracted/SCHOOL_SY2022")) %>%
   st_make_valid()
 ```
 
@@ -326,14 +326,14 @@ Note: The 3D plot above is interactive! Feel free to rotate and zoom to explore 
 ```{r hidden_setup_end, include=FALSE, eval=TRUE}
 # Hidden code chunk for deleting downloaded files after use
 # Zipped files
-files_to_delete <- c(paste0(local_path, "data-raw/Downloads/zip_codes_2022.zip"), 
-paste0(local_path, "data-raw/Downloads/state_shape.zip"), paste0(local_path, "data-raw/Downloads/district_shapes_2022.zip"))
+files_to_delete <- c(paste0(local_path, "/data-raw/Downloads/zip_codes_2022.zip"), 
+paste0(local_path, "/data-raw/Downloads/state_shape.zip"), paste0(local_path, "/data-raw/Downloads/district_shapes_2022.zip"))
 file.remove(files_to_delete)
 
 # Extracted files
 names <- c("ZIP_2022", "North_Carolina_State_Boundary", "SCHOOL_SY2022")
 for (name in names) {
-  to_delete <- list.files(paste0(local_path, "data-raw/Extracted/", name), full.names = TRUE)
+  to_delete <- list.files(paste0(local_path, "/data-raw/Extracted/", name), full.names = TRUE)
   file.remove(to_delete)
 }
 ```
