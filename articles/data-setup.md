@@ -132,7 +132,7 @@ suppressWarnings(stata(src = paste0(local_path, "/data-raw/NCAddresses.do"), sta
 ## Next Steps
 
 Different raw data structures will require unique approaches to produce
-a format compatible with QOR functions. However, With cleaned addresses,
+a format compatible with QOR functions. However, with cleaned addresses,
 you are now ready to geocode your data and apply the QOR method. Your
 addresses should look similar to the following example input dataframe
 when correctly prepared for
