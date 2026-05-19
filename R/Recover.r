@@ -174,6 +174,7 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
       no_zip$postalcode[no_zip$unit_id == uid] <- my_zip  # preserves NA/empty/short value for diagnostics
       unmatchedset <- unmatchedset %>% dplyr::filter(., .data$unit_id != uid)
       missing_count <- missing_count + 1
+      rm(temp2)
       next  # skip the rest of this iteration
     }
     if(nchar(my_zip) > 5) {
@@ -188,6 +189,7 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
       unmatchedset$polygon_id[unmatchedset$unit_id == uid] <- data$polygon_id
       unmatchedset$distance[unmatchedset$unit_id == uid] <- data$distance
       unmatchedset$postalcode[unmatchedset$unit_id == uid] <- data$postalcode
+      rm(data)
     } else if(length(unique(data$postalcode)) != 1) {
       # store units with no zip match in separate dataset to return/inspect 
       temp2 <- unmatchedset %>% dplyr::filter(., .data$unit_id == uid) %>% dplyr::select(., -c(matched_byzip, polygon_id, distance))
@@ -196,10 +198,11 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
       # Remove from unmatchedset if no match possible (zip not in census shapefile for the state)
       unmatchedset <- unmatchedset %>% dplyr::filter(., .data$unit_id != uid) 
       missing_count <- missing_count + 1
+      rm(temp2)
     }
   }
   
-  rm(statedistances, temp, data, all_ids, my_zip, id_count, uid) # free up RAM immediately
+  rm(statedistances, all_ids, my_zip, id_count, uid) # free up more RAM immediately
   gc() # garbage collection
   tictoc::toc(log = TRUE) # store recovery loop time
 
