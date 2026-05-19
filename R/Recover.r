@@ -19,7 +19,7 @@
 #' @param zip_id Name of the column in the zipcodes sf object that contains unique identifiers for each zipcode (default: "postalcode"). Preferably as string.
 #' @param state_shape sf object containing the shape of the state (used to filter zipcodes to the state).
 #' @param used_NCES Boolean indicating whether the user input NCES school district shapefiles or other shapefiles with a state FIPS_code as the polygons (default: FALSE).
-#' @param FIPS_code State FIPS code in two-digit character form (e.g., '09', '10',  etc...) to filter NCES school district shapefiles (default: NULL, which means no filtering by state).
+#' @param FIPS_code State FIPS code in two-digit character form (e.g., '09', '10',  etc...) to filter NCES school district shapefiles (default: NULL, which means no filtering by state). NOTE: If FIPS_code indicates a New England state, the Recover function will automatically pad short strings with extra left zeros (e.g., 1201 --> 01201)
 #' @param FIPS_col Column name in your polygons dataset containing FIPS_code. Preferably should be a character/string variable (default: NULL, which means no filtering by state).
 #'
 #' @return A list with two items: (1) Tibble with five columns: unit_id (string), polygon_id (string), postalcode (string), distance (numeric, meters), and a binary flag for matched_byzip, where each unit_id is matched to one polygon_id. (2) Tibble for units that could not be matched to a zipcode (i.e., no recovery possible) with columns for unit_id and postalcode.
@@ -61,7 +61,7 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
         stop(paste("The zip_id ('", zip_id, "') does not uniquely identify each row in the zipcodes dataset.", sep = ""))
     } else if (!is.null(FIPS_code) & is.null(FIPS_col)) {
         stop("If you provide a value for FIPS_code, you must also provide the name of the column containing state FIPS codes in your polygons dataset (FIPS_col).")
-    } else if (!is.null(FIPS_code) & (!is.character(FIPS_code) || nchar(FIPS_code) != 2)) {
+    } else if (!is.null(FIPS_code) && (!is.character(FIPS_code) || nchar(FIPS_code) != 2)) {
     stop("FIPS_code must be a two-digit character string (e.g., '09', '37').")
     } else if (is.null(FIPS_code) & !is.null(FIPS_col)) {
         stop("If you provide a value for FIPS_col, you must also provide a value for FIPS_code to filter your polygons dataset by state.")
