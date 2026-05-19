@@ -202,7 +202,7 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
     }
   }
   
-  rm(statedistances, all_ids, my_zip, id_count, uid) # free up more RAM immediately
+  rm(statedistances) # free up more RAM immediately
   gc() # garbage collection
   tictoc::toc(log = TRUE) # store recovery loop time
 
