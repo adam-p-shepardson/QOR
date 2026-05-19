@@ -152,6 +152,7 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
       # Store in districtset
       districtset$polygon_id[districtset$point_id == vid] <- data$polygon_id
       districtset$distance[districtset$point_id == vid] <- data$distance
+      rm(data)
     } 
     for(vid in in_nodistricts) { # If in no districts, extract closest one
       # Filter statedistances dataset to just a single point_id, extract the row with the closest district (based on internal point)
@@ -159,11 +160,8 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
       # Store in districtset
       districtset$polygon_id[districtset$point_id == vid] <- data$polygon_id
       districtset$distance[districtset$point_id == vid] <- data$distance
+      rm(data)
     }
-  
-  if(exists("data")) {
-    rm(data) 
-  }
   rm(distances, intersections, id_count) # free up RAM
   
   gc() # garbage collection
