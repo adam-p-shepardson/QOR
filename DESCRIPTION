@@ -1,6 +1,6 @@
 Package: QOR
 Title: Functions to Identify Who Can Vote in What School District
-Version: 0.9.0.0
+Version: 0.9.1.0
 Authors@R: c(
     person("Adam", "Shepardson", , "apshepardson@albany.edu", role = c("aut", "cre"), comment = c(ORCID = "0009-0004-1153-8014")),
     person("Melissa", "Lyon", , "mlyon@albany.edu", role = c("ctb"), comment = c(ORCID = "0000-0002-4388-6337")), 
