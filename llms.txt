@@ -81,6 +81,7 @@ proper citation. Each step corresponds to a function in the QOR package:
 To install the QOR package, use the following code in R:
 
 ``` r
+
  remotes::install_github("adam-p-shepardson/QOR", dependencies=TRUE)
 ```
 
@@ -111,6 +112,7 @@ For example, it is possible to copy a link to .zip folders and unzip
 them in R like so:
 
 ``` r
+
 # Download
 utils::download.file(url = "YOUR URL", destfile = "ZIP FOLDER DESTINATION PATH", mode = "wb", method = "auto")
 

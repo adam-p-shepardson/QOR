@@ -8,6 +8,7 @@ of R packages below are likely to be helpful in these tasks, and are
 dependencies of the QOR package itself:
 
 ``` r
+
 library(tidyverse)
 library(dplyr)
 library(haven)
@@ -41,6 +42,7 @@ users will need to obtain their own voter registration data from a
 relevant governmental unit (or a paid provider like L2).
 
 ``` r
+
 # Increase timeout for large files
 options(timeout = 1000)
 
@@ -75,6 +77,7 @@ before address processing. Note that the “ncid” field is randomized and
 does not correspond to actual voter IDs.
 
 ``` r
+
 # Download anonymized voter registration extracts (Taken Jan. 1, 2022)
 download.file(url = extracts, destfile = paste0(local_path, "/data-raw/Downloads/Extracts_2022.zip"), mode = "wb", method = "auto")
 unzip(zipfile = paste0(local_path, "/data-raw/Downloads/Extracts_2022.zip"), exdir = paste0(local_path, "/data-raw/Extracted"))
@@ -118,6 +121,7 @@ programming language.
   state
 
 ``` r
+
 ## Read in cleaned sample
 # We call an external Stata .do file (available on GitHub) for simplicity:
 library(RStata)
@@ -139,6 +143,7 @@ when correctly prepared for
 [`query()`](https://adam-p-shepardson.github.io/QOR/reference/query.md).
 
 ``` r
+
 # Read the cleaned example addresses
 example <- haven::read_dta(system.file("example_data", "sample_2022_addresses.dta", package = "QOR"))
 

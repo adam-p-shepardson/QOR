@@ -12,6 +12,7 @@ school district, state, and zip code shapefiles from North Carolina.
 ## Load Package and Data
 
 ``` r
+
 # You would need your local path below to run the setup examples:
 local_path <- here::here()  # Change this to your local path
 
@@ -42,6 +43,7 @@ data frames: one with successfully geocoded points and another with
 addresses that could not be geocoded.
 
 ``` r
+
 test_query <- query(
   units = example,
   unit_id = "statevoterid",
@@ -56,7 +58,7 @@ test_query <- query(
   unit_zip = "postalcode",
   max_tries = 15
 )
-#> Runtime: Query Full Time: 1718.6 sec elapsed
+#> Runtime: Query Full Time: 2238.679 sec elapsed
 
 matched <- test_query[[1]]    # Successfully geocoded (use for Overlay)
 unmatched <- test_query[[2]]  # Failed to geocode (use for Recover)
@@ -66,6 +68,7 @@ We can demonstrate that the geocoding worked by plotting the matched
 points against the state boundary and district shapes:
 
 ``` r
+
 # Packages for plotting
 library(ggplot2)
 library(ggthemes)
@@ -103,6 +106,7 @@ function. This function assigns each geocoded point to a polygon (school
 district) based on spatial location.
 
 ``` r
+
 test_overlay <- overlay(
   points = matched,
   polygons = district_shape,
@@ -123,6 +127,7 @@ between zip code and polygon centers to assign unmatched units to
 polygons.
 
 ``` r
+
 test_recover <- recover(
   units = unmatched,
   polygons = district_shape,
