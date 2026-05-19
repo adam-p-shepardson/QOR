@@ -62,7 +62,7 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
     } else if (!is.null(FIPS_code) & is.null(FIPS_col)) {
         stop("If you provide a value for FIPS_code, you must also provide the name of the column containing state FIPS codes in your polygons dataset (FIPS_col).")
     } else if (!is.null(FIPS_code) && (!is.character(FIPS_code) || nchar(FIPS_code) != 2)) {
-    stop("FIPS_code must be a two-digit character string (e.g., '09', '37').")
+        stop("FIPS_code must be a two-digit character string (e.g., '09', '37').")
     } else if (is.null(FIPS_code) & !is.null(FIPS_col)) {
         stop("If you provide a value for FIPS_col, you must also provide a value for FIPS_code to filter your polygons dataset by state.")
     } else if (!is.null(FIPS_col) & !FIPS_col %in% names(polygons)) {
@@ -164,7 +164,7 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
     my_zip <- stringr::str_trim(temp$postalcode[1], side = "both")
     # Try to accomodate zips with leading zeros that users may have convered to numeric (wrongly)
     if (as.character(FIPS_code) %in% paddable && !is.na(my_zip) && nchar(my_zip) > 0 && nchar(my_zip) < 5) {
-    my_zip <- stringr::str_pad(my_zip, width = 5, side = "left", pad = "0")
+        my_zip <- stringr::str_pad(my_zip, width = 5, side = "left", pad = "0")
     }
     # Treat NA, empty string, or short strings as missing
     if (is.na(my_zip) || my_zip == "" || nchar(my_zip) < 5) {
