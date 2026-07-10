@@ -74,10 +74,10 @@ query(
 
   Geocoding method to use (default: "census"). See methods from
   [`tidygeocoder::geocode()`](https://jessecambon.github.io/tidygeocoder/reference/geocode.html).
-  We recommend "census" for best cost (free) and batch geocoding. You
-  may need to adjust parts of code that select outputs if using
-  different method, and not all methods may support the batch coding
-  that we use by default.
+  We recommend "census" for best cost (free) and batch geocoding, and it
+  is the only supported method currently. You may need to adjust parts
+  of code that select outputs if using different method, and not all
+  methods may support the batch coding that we use by default.
 
 - sleep_time:
 
@@ -89,9 +89,8 @@ query(
 
   RECOMMENDED BUT OPTIONAL name of the column in the units dataframe
   that contains the postal code (default: "postalcode"). Preferably as
-  string. Output will have a postalcode column if provided, but this
-  column will be NA if not provided. "Recover" will NOT be able to match
-  any unmatched units if postalcode not provided here.
+  string. Output will return this column if provided. "Recover" will NOT
+  be able to match any unmatched units if postalcode not provided here.
 
 - max_tries:
 

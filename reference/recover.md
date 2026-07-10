@@ -73,8 +73,11 @@ recover(
 
 - FIPS_code:
 
-  State FIPS code to filter NCES school district shapefiles (default:
-  NULL, which means no filtering by state).
+  State FIPS code in two-digit character form (e.g., '09', '10', etc...)
+  to filter NCES school district shapefiles (default: NULL, which means
+  no filtering by state). NOTE: If FIPS_code indicates a New England
+  state, the Recover function will automatically pad short strings with
+  extra left zeros (e.g., 1201 –\> 01201)
 
 - FIPS_col:
 

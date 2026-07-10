@@ -95,7 +95,7 @@
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
-<dd><p>Geocoding method to use (default: "census"). See methods from <code><a href="https://jessecambon.github.io/tidygeocoder/reference/geocode.html" class="external-link">tidygeocoder::geocode()</a></code>. We recommend "census" for best cost (free) and batch geocoding. You may need to adjust parts of code that select outputs if using different method, and not all methods may support the batch coding that we use by default.</p></dd>
+<dd><p>Geocoding method to use (default: "census"). See methods from <code><a href="https://jessecambon.github.io/tidygeocoder/reference/geocode.html" class="external-link">tidygeocoder::geocode()</a></code>. We recommend "census" for best cost (free) and batch geocoding, and it is the only supported method currently. You may need to adjust parts of code that select outputs if using different method, and not all methods may support the batch coding that we use by default.</p></dd>
 
 
 <dt id="arg-sleep-time">sleep_time<a class="anchor" aria-label="anchor" href="#arg-sleep-time"></a></dt>
@@ -103,7 +103,7 @@
 
 
 <dt id="arg-unit-zip">unit_zip<a class="anchor" aria-label="anchor" href="#arg-unit-zip"></a></dt>
-<dd><p>RECOMMENDED BUT OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Preferably as string. Output will have a postalcode column if provided, but this column will be NA if not provided. "Recover" will NOT be able to match any unmatched units if postalcode not provided here.</p></dd>
+<dd><p>RECOMMENDED BUT OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Preferably as string. Output will return this column if provided. "Recover" will NOT be able to match any unmatched units if postalcode not provided here.</p></dd>
 
 
 <dt id="arg-max-tries">max_tries<a class="anchor" aria-label="anchor" href="#arg-max-tries"></a></dt>

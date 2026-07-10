@@ -98,7 +98,7 @@
 
 
 <dt id="arg-fips-code">FIPS_code<a class="anchor" aria-label="anchor" href="#arg-fips-code"></a></dt>
-<dd><p>State FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state).</p></dd>
+<dd><p>State FIPS code in two-digit character form (e.g., '09', '10',  etc...) to filter NCES school district shapefiles (default: NULL, which means no filtering by state). NOTE: If FIPS_code indicates a New England state, the Recover function will automatically pad short strings with extra left zeros (e.g., 1201 –&gt; 01201)</p></dd>
 
 
 <dt id="arg-fips-col">FIPS_col<a class="anchor" aria-label="anchor" href="#arg-fips-col"></a></dt>
