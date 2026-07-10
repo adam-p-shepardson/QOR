@@ -14,7 +14,7 @@ source(paste0(local_path, "data-raw/download_data.r"))
 # Re-compile package and load QOR
 devtools::document("~/GitHub/Academic/QOR")
 devtools::load_all("~/GitHub/Academic/QOR")
-
+    
 # Re-compile github website (local testing)
 pkgdown::clean_site("~/GitHub/Academic/QOR")
 pkgdown::build_site("~/GitHub/Academic/QOR")

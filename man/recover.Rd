@@ -37,7 +37,7 @@ recover(
 
 \item{used_NCES}{Boolean indicating whether the user input NCES school district shapefiles or other shapefiles with a state FIPS_code as the polygons (default: FALSE).}
 
-\item{FIPS_code}{State FIPS code to filter NCES school district shapefiles (default: NULL, which means no filtering by state).}
+\item{FIPS_code}{State FIPS code in two-digit character form (e.g., '09', '10',  etc...) to filter NCES school district shapefiles (default: NULL, which means no filtering by state). NOTE: If FIPS_code indicates a New England state, the Recover function will automatically pad short strings with extra left zeros (e.g., 1201 --> 01201)}
 
 \item{FIPS_col}{Column name in your polygons dataset containing FIPS_code. Preferably should be a character/string variable (default: NULL, which means no filtering by state).}
 }

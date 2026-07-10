@@ -36,11 +36,11 @@ query(
 
 \item{year}{Year of the data (preferably numeric) for use with "census" method. (default: NULL, which throws an error). Program was designed for years 2007 through 2025 using the "census" method. Years <= 2010 will use the 2010 Census database, and years > 2025 will use the current Census database.}
 
-\item{method}{Geocoding method to use (default: "census"). See methods from \code{tidygeocoder::geocode()}. We recommend "census" for best cost (free) and batch geocoding. You may need to adjust parts of code that select outputs if using different method, and not all methods may support the batch coding that we use by default.}
+\item{method}{Geocoding method to use (default: "census"). See methods from \code{tidygeocoder::geocode()}. We recommend "census" for best cost (free) and batch geocoding, and it is the only supported method currently. You may need to adjust parts of code that select outputs if using different method, and not all methods may support the batch coding that we use by default.}
 
 \item{sleep_time}{Time to pause between batches (default: 2 seconds). Try increasing if you are getting rate-limited by the geocoding service or encountering connection issues.}
 
-\item{unit_zip}{RECOMMENDED BUT OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Preferably as string. Output will have a postalcode column if provided, but this column will be NA if not provided. "Recover" will NOT be able to match any unmatched units if postalcode not provided here.}
+\item{unit_zip}{RECOMMENDED BUT OPTIONAL name of the column in the units dataframe that contains the postal code (default: "postalcode"). Preferably as string. Output will return this column if provided. "Recover" will NOT be able to match any unmatched units if postalcode not provided here.}
 
 \item{max_tries}{Number of times to attempt geocoding for each unit if a call to API fails (default: 15). Try increasing if you are getting rate-limited by the geocoding service or encountering connection issues. If a unit fails to geocode after this many attempts, it will be stored as unmatched and the function will move on to the next unit.}
 }
