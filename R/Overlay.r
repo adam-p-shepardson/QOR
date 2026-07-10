@@ -43,11 +43,11 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
     stop(paste("The point_id ('", point_id, "') does not uniquely identify each row in the points dataset.", sep = ""))
   } else if (length((unique(polygons[[polygon_id]]))) != length(polygons[[polygon_id]])) {
     stop(paste("The polygon_id ('", polygon_id, "') does not uniquely identify each row in the polygons dataset.", sep = ""))
-  } else if (!is.null(FIPS_code) & is.null(FIPS_col)) {
+  } else if (!is.null(FIPS_code) && is.null(FIPS_col)) {
     stop("If you provide a value for FIPS_code, you must also provide the name of the column containing state FIPS codes in your polygons dataset (FIPS_col).")
-  } else if (is.null(FIPS_code) & !is.null(FIPS_col)) {
+  } else if (is.null(FIPS_code) && !is.null(FIPS_col)) {
     stop("If you provide a value for FIPS_col, you must also provide a value for FIPS_code to filter your polygons dataset by state.")
-  } else if (!is.null(FIPS_col) & !FIPS_col %in% names(polygons)) {
+  } else if (!is.null(FIPS_col) && !FIPS_col %in% names(polygons)) {
     stop(paste("The FIPS_col ('", FIPS_col, "') provided was not found in the polygons dataset.", sep = ""))
   } else { # Can proceed after equalizing crs
     # Clean up geometries
@@ -74,13 +74,13 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
     }
 
     # If NCES shapefiles but user is not filtering, inform about ability to filter polygons to the state FIPS code
-    if (used_NCES == TRUE & (is.null(FIPS_code) | is.null(FIPS_col))) {
-      warning(paste("Raw NCES school district shapefiles are national and we can use a State FIPS code to filter them (massively reduce compute time).\nWe strongly suggest providing a value for state_FIPS (e.g., '37' for North Carolina)."
+    if (used_NCES == TRUE && (is.null(FIPS_code) || is.null(FIPS_col))) {
+      warning(paste("Raw NCES school district shapefiles are national and we can use a State FIPS code to filter them (massively reduce compute time).\nWe strongly suggest providing a value for FIPS_code (e.g., '37' for North Carolina)."
         ))
     } 
 
     # Filter down to state FIPS code if user is providing FIPS
-    if (!is.null(FIPS_code) & !is.null(FIPS_col)) {
+    if (!is.null(FIPS_code) && !is.null(FIPS_col)) {
       polygons <- polygons %>%
       dplyr::filter(., .data$state_fips == as.character(FIPS_code)) # filters polygons to the state FIPS code
     } 
@@ -116,7 +116,7 @@ overlay <- function(points = NULL, polygons = NULL, point_id = "point_id", polyg
   # Change distances to tidy format
   distances <- rownames_to_column(distances, "point_id") 
   distances <- distances %>% 
-    tidyr::pivot_longer(cols = !.data$point_id, names_to = "polygon_id", values_to = "distance") 
+    tidyr::pivot_longer(cols = -"point_id", names_to = "polygon_id", values_to = "distance") 
   distances$distance <- as.numeric(distances$distance) # remove units so that minimum calculation works. Note: all values still in m (meters) by default
 
   # Print the point_ids for any points in multiple or no polygons

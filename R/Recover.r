@@ -30,7 +30,7 @@
 #' @importFrom tictoc tic.clearlog tic toc
 #' @importFrom sf st_make_valid st_transform st_point_on_surface st_crs st_filter st_centroid st_distance
 #' @importFrom tibble rownames_to_column
-#' @importFrom stringr str_trim str_sub
+#' @importFrom stringr str_trim str_sub str_pad
 #' @export
 recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "unit_id", unit_zip = "postalcode", 
     polygon_id = "polygon_id", zip_id = "postalcode", state_shape = NULL, used_NCES = FALSE, FIPS_code = NULL, FIPS_col = NULL) {
@@ -39,10 +39,10 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
     tictoc::tic("Runtime: Recover Full Time") # Start timer for the entire recover process
 
     # Check that the inputs are valid
-    if (is.null(units) || is.null(polygons) || is.null(zipcodes) || is.null(state_shape) || nrow(units) == 0 || nrow(polygons) == 0 || nrow(zipcodes) == 0) {
-        stop("The units dataset, polygons shapefile, zipcodes shapefile, and a state shapefile must all be provided.")
-    } else if (!is.data.frame(units)) {
+    if (!is.data.frame(units)) {
         stop("Units must be a data.frame or tibble object.")
+    } else if (is.null(units) || is.null(polygons) || is.null(zipcodes) || is.null(state_shape) || nrow(units) == 0 || nrow(polygons) == 0 || nrow(zipcodes) == 0) {
+        stop("The units dataset, polygons shapefile, zipcodes shapefile, and a state shapefile must all be provided.")
     } else if (!inherits(polygons, "sf") || !inherits(zipcodes, "sf")) {
         stop("Polygons and zipcodes must be sf objects (convert to sf format using functions from sf package).")
     } else if (!unit_id %in% names(units) || !unit_zip %in% names(units)) {
@@ -59,13 +59,13 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
         stop(paste("The polygon_id ('", polygon_id, "') does not uniquely identify each row in the polygons dataset.", sep = ""))
     } else if (length((unique(zipcodes[[zip_id]]))) != length(zipcodes[[zip_id]])) {
         stop(paste("The zip_id ('", zip_id, "') does not uniquely identify each row in the zipcodes dataset.", sep = ""))
-    } else if (!is.null(FIPS_code) & is.null(FIPS_col)) {
+    } else if (!is.null(FIPS_code) && is.null(FIPS_col)) {
         stop("If you provide a value for FIPS_code, you must also provide the name of the column containing state FIPS codes in your polygons dataset (FIPS_col).")
     } else if (!is.null(FIPS_code) && (!is.character(FIPS_code) || nchar(FIPS_code) != 2)) {
         stop("FIPS_code must be a two-digit character string (e.g., '09', '37').")
-    } else if (is.null(FIPS_code) & !is.null(FIPS_col)) {
+    } else if (is.null(FIPS_code) && !is.null(FIPS_col)) {
         stop("If you provide a value for FIPS_col, you must also provide a value for FIPS_code to filter your polygons dataset by state.")
-    } else if (!is.null(FIPS_col) & !FIPS_col %in% names(polygons)) {
+    } else if (!is.null(FIPS_col) && !FIPS_col %in% names(polygons)) {
         stop(paste("The FIPS_col ('", FIPS_col, "') provided was not found in the polygons dataset.", sep = ""))
     } else { # Can proceed after equalizing crs
         # Clean up geometries
@@ -104,19 +104,27 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
         }
 
         # If NCES shapefiles but user is not filtering, inform about ability to filter polygons to the state FIPS code
-        if (used_NCES == TRUE & (is.null(FIPS_code) | is.null(FIPS_col))) {
+        if (used_NCES == TRUE && (is.null(FIPS_code) || is.null(FIPS_col))) {
           warning(paste(
-          "Raw NCES school district shapefiles are national and we can use a State FIPS code to filter them (massively reduce compute time).\nWe strongly suggest providing a value for state_FIPS (e.g., '37' for North Carolina)."
+          "Raw NCES school district shapefiles are national and we can use a State FIPS code to filter them (massively reduce compute time).\nWe strongly suggest providing a value for FIPS_code (e.g., '37' for North Carolina)."
           ))
         } 
 
         # Filter down to state FIPS code if user is providing FIPS
-        if (!is.null(FIPS_code) & !is.null(FIPS_col)) {
+        if (!is.null(FIPS_code) && !is.null(FIPS_col)) {
           polygons <- polygons %>%
-          dplyr::filter(., .data$state_fips == as.character(FIPS_code))
+            dplyr::filter(., .data$state_fips == as.character(FIPS_code))
+
+          if(nrow(polygons) == 0) {
+            stop(paste("No polygons found for the provided FIPS_code ('", FIPS_code, "'). Please check your FIPS_code and FIPS_col inputs.", sep = ""))
+          }
         } 
     }
   
+  # Remove any zips with missing ID's
+  zipcodes <- zipcodes %>%
+    dplyr::filter(!is.na(.data$postalcode) & .data$postalcode != "")
+
   # Find zip centroids
   statezips_center <- sf::st_centroid(zipcodes)
 
@@ -151,7 +159,7 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
   
   ## Assign the recovered units to the closest polygon to zip centroid (based on internal point)
   no_zip <- tibble()
-  paddable <- c("09", "25", "23", "33", "34", "44", "50") # states that zero-pad zip codes (New England)
+  paddable <- c("09", "23", "25", "33", "34", "36", "44", "50") # states that can have zero-pad zip codes (New England)
   for(uid in all_ids) {
     id_count <- id_count + 1
       if (id_count %% 1000 == 0) { # progress update every 1000 ids
@@ -160,10 +168,10 @@ recover <- function(units = NULL, polygons = NULL, zipcodes = NULL, unit_id = "u
 
     # Get the unit's postalcode
     temp <- units %>% 
-      filter(., unit_id == uid)
+      filter(., .data$unit_id == uid)
     my_zip <- stringr::str_trim(temp$postalcode[1], side = "both")
     # Try to accomodate zips with leading zeros that users may have convered to numeric (wrongly)
-    if (as.character(FIPS_code) %in% paddable && !is.na(my_zip) && nchar(my_zip) > 0 && nchar(my_zip) < 5) {
+    if (!is.null(FIPS_code) && as.character(FIPS_code) %in% paddable && !is.na(my_zip) && nchar(my_zip) > 0 && nchar(my_zip) < 5) {
         my_zip <- stringr::str_pad(my_zip, width = 5, side = "left", pad = "0")
     }
     # Treat NA, empty string, or short strings as missing
