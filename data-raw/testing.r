@@ -1,11 +1,11 @@
 # Metadata ----
 # Authors: Adam Shepardson
 # Contact: apshepardson@albany.edu
-# Date Last Edited: 02/10/2026
+# Date Last Edited: 07/15/2026
 # Purpose: Test QOR package functions
 
 # Path
-local_path <- "~/GitHub/Academic/QOR/"
+local_path <- "~/GitHub/Academic/QOR/" # Linux path
 library(tidyverse)
 
 # Download necessary files for testing (too big to store on GitHub)
