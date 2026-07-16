@@ -23,11 +23,12 @@
 #'
 #' @return A list with two items: (1) Tibble of matched units with their geocoded coordinates, and (2) Tibble of unmatched units (those that could not be geocoded).
 #'
-#' @importFrom dplyr mutate filter bind_rows tibble
+#' @importFrom dplyr mutate filter bind_rows tibble across everything
 #' @importFrom magrittr %>%
 #' @importFrom tictoc tic.clearlog tic toc
 #' @importFrom tidygeocoder geocode
-#' @importFrom sf st_as_sf st_crs st_transform st_make_valid st_filter read_sf st_drop_geometry
+#' @importFrom sf st_crs st_transform st_make_valid st_filter st_drop_geometry st_sfc st_multipoint st_cast st_sf
+#' @importFrom rlang .data
 #' @export
 query <- function(units = NULL, unit_id = "unit_id", street = "street", city = "city", state = "state", state_shape = NULL, 
 units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, unit_zip = "postalcode", max_tries = 15) {
@@ -265,22 +266,22 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, unit_zip
     }
 
     # Convert to sf object
-    coord <- dplyr::mutate(longitude = as.numeric(longitude), latitude = as.numeric(latitude)) # need to be numeric
+    n_before <- nrow(coord)
+    coord <- coord %>% dplyr::mutate(longitude = as.numeric(longitude), latitude = as.numeric(latitude)) # need to be numeric
     coerce_failed <- coord %>% dplyr::filter(is.na(.data$longitude) | is.na(.data$latitude))
     if (nrow(coerce_failed) > 0) { # if any geocoding output could not be coverted properly, add to still_unmatched for Recover()
         still_unmatched <- dplyr::bind_rows(still_unmatched, coerce_failed %>% dplyr::select(-longitude, -latitude))
         coord <- coord %>% dplyr::filter(!.data$unit_id %in% coerce_failed$unit_id)
+    }
+    # Check coercion broadly worked before building geometry (geocoder could return long/lat in an unexpected format if it updates without me knowing)
+    if (nrow(coord) == 0 || nrow(coerce_failed) > (n_before * .95)) {
+        stop("Very few, if any, units were successfully geocoded. Please check your inputs, internet connection, and expected output from geocoder, then try again.")
     }
     isolate_coords <- as.matrix(coord[, c("longitude", "latitude")])
     storage.mode(isolate_coords) <- "double"
     geo <- sf::st_sfc(sf::st_multipoint(isolate_coords), crs = sf::st_crs(4326)) %>% # This is the crs code for long/lat coordinates. See halfway down the page here: https://www.paulamoraga.com/book-spatial/the-sf-package-for-spatial-vector-data.html
         sf::st_cast("POINT")
     coord <- sf::st_sf(coord, geometry = geo)
-
-    # Check coercion broadly worked before building geometry (geocoder could return long/lat in an unexpected format if it updates without me knowing)
-    if (sum(is.na(coord$longitude)) > (nrow(coord) * .95) || sum(is.na(coord$latitude)) > (nrow(coord) * .95)) {
-        stop("Very few, if any, units were successfully geocoded. Please check your inputs, internet connection, and expected output from geocoder, then try again.")
-    }
 
     # free some space
     rm(sample2, failed, grp_assign, sample_list, unitgroups, num, unitnum, id_count, sample2_ids, isolate_coords, geo, coerce_failed)
@@ -302,9 +303,7 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, unit_zip
     
     if(length(unique(not_instate$unit_id)) > 0) { 
         still_unmatched <- dplyr::bind_rows(still_unmatched, not_instate)
-    } else { # Do not need to append if nothing in "not_instate"
-        still_unmatched coerce_failed<- still_unmatched
-    }
+    } 
 
     # Retain only relevant columns
     if(!is.null(unit_zip) && "postalcode" %in% names(units)) { 
