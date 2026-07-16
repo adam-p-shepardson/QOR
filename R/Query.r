@@ -265,42 +265,45 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, unit_zip
     }
 
     # Convert to sf object
-    coord <- dplyr::mutate(coord, longitude = as.numeric(longitude), latitude = as.numeric(latitude)) # need to be numeric
+    coord <- dplyr::mutate(longitude = as.numeric(longitude), latitude = as.numeric(latitude)) # need to be numeric
     coerce_failed <- coord %>% dplyr::filter(is.na(.data$longitude) | is.na(.data$latitude))
     if (nrow(coerce_failed) > 0) { # if any geocoding output could not be coverted properly, add to still_unmatched for Recover()
         still_unmatched <- dplyr::bind_rows(still_unmatched, coerce_failed %>% dplyr::select(-longitude, -latitude))
         coord <- coord %>% dplyr::filter(!.data$unit_id %in% coerce_failed$unit_id)
     }
+    isolate_coords <- as.matrix(coord[, c("longitude", "latitude")])
+    storage.mode(isolate_coords) <- "double"
+    geo <- sf::st_sfc(sf::st_multipoint(isolate_coords), crs = sf::st_crs(4326)) %>% # This is the crs code for long/lat coordinates. See halfway down the page here: https://www.paulamoraga.com/book-spatial/the-sf-package-for-spatial-vector-data.html
+        sf::st_cast("POINT")
+    coord <- sf::st_sf(coord, geometry = geo)
 
     # Check coercion broadly worked before building geometry (geocoder could return long/lat in an unexpected format if it updates without me knowing)
     if (sum(is.na(coord$longitude)) > (nrow(coord) * .95) || sum(is.na(coord$latitude)) > (nrow(coord) * .95)) {
         stop("Very few, if any, units were successfully geocoded. Please check your inputs, internet connection, and expected output from geocoder, then try again.")
     }
 
-    coord <- sf::st_as_sf(coord, coords = c("longitude", "latitude"))
-    sf::st_crs(coord) <- 4326 # This is the code for long/lat coordinates. See halfway down the page here: https://www.paulamoraga.com/book-spatial/the-sf-package-for-spatial-vector-data.html
-
     # free some space
-    rm(sample2, failed, grp_assign, sample_list, unitgroups, num, unitnum, id_count, sample2_ids)
+    rm(sample2, failed, grp_assign, sample_list, unitgroups, num, unitnum, id_count, sample2_ids, isolate_coords, geo, coerce_failed)
     gc() # garbage collection
   
     ## Now filter out any points that are outside the state shape (these will be considered unmatched)
     # Clean up state geometry
     state_shape <- state_shape %>%
-        sf::st_make_valid() %>%
-        sf::st_transform(., crs = sf::st_crs(coord)) # sets the two objects to the same coordinate reference system.
+        sf::st_transform(., crs = sf::st_crs(coord)) %>% # sets the two objects to the same coordinate reference system.
+        sf::st_make_valid()  
 
     # Units placed outside state shape will be considered unmatched
     in_state <- sf::st_filter(coord, state_shape) 
     not_instate <- coord %>% dplyr::filter(., !.data$unit_id %in% in_state$unit_id) %>%
-        dplyr::mutate(., longitude = NA, latitude = NA) %>% sf::st_drop_geometry() # We will consider these unmatched
+        dplyr::mutate(., longitude = NA, latitude = NA) %>% 
+        sf::st_drop_geometry() # We will consider these unmatched
     coord <- coord %>% 
         dplyr::filter(., .data$unit_id %in% in_state$unit_id)
     
     if(length(unique(not_instate$unit_id)) > 0) { 
         still_unmatched <- dplyr::bind_rows(still_unmatched, not_instate)
     } else { # Do not need to append if nothing in "not_instate"
-        still_unmatched <- still_unmatched
+        still_unmatched coerce_failed<- still_unmatched
     }
 
     # Retain only relevant columns
