@@ -1,7 +1,7 @@
 # Metadata ----
 # Authors: Adam Shepardson
 # Contact: apshepardson@albany.edu
-# Date Last Edited: 1/29/2026
+# Date Last Edited: 7/15/2026
 # Purpose: Download files and Create Small Sample of Voter Addresses for Package Testing
 
 # Load relevant packages -----
@@ -16,19 +16,19 @@ local_path <- "~/GitHub/Academic/QOR/"
 
 ## Pre-anonymize and Sample Voter data ---- 
 # To replicate this step, find public NC voter registration data online for yourself. The extracts_orig file here is not stored anymore.
-set.seed(5)
-extracts_orig <- "https://www.dropbox.com/scl/fi/ayb9s98b5tzr3hfo28baj/Example-Extracts.zip?rlkey=bq5pvd4i8y1mxvnmxnapo27bb&st=q4hg1lmv&dl=1"
-download.file(url = extracts_orig, destfile = paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), mode = "wb", method = "auto")
-unzip(zipfile = paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), exdir = paste0(local_path, "data-raw/Extracted"))
-sample_orig <- read_dta(paste0(local_path, "data-raw/Extracted/Example Extracts/VR_Snapshot_2022_ACTIVE.dta")) %>%
-    bind_rows(., read_dta(paste0(local_path, "data-raw/Extracted/Example Extracts/VR_Snapshot_2022_INACTIVETEMP.dta")))
-anonymized <- sample_orig %>%
-    distinct(ncid, .keep_all = TRUE) %>% # unique rows by NCID
-    sample_frac(size = 1, replace = FALSE) %>% # shuffle rows
-    mutate(ncid = row_number()) %>% # replace NCID with anonymized ID
-    slice_sample(prop = .005) %>% # take a small random sample covering 0.5% of the 2022 registered voters from North Carolina
-    select(ncid, house_num, half_code, street_dir, street_name, street_type_cd, street_sufx_cd, unit_designator, unit_num, res_city_desc, state_cd, zip_code) %>% # only keep address components and ID
-    write_dta(., paste0(local_path, "data-raw/Extracted/Example Extracts/VR_Snapshot_2022_ALL_Anonymized.dta"))
+#set.seed(5)
+#extracts_orig <- "https://www.dropbox.com/scl/fi/ayb9s98b5tzr3hfo28baj/Example-Extracts.zip?rlkey=bq5pvd4i8y1mxvnmxnapo27bb&st=q4hg1lmv&dl=1"
+#download.file(url = extracts_orig, destfile = paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), mode = "wb", method = "auto")
+#unzip(zipfile = paste0(local_path, "data-raw/Downloads/Extracts_2022.zip"), exdir = paste0(local_path, "data-raw/Extracted"))
+#sample_orig <- read_dta(paste0(local_path, "data-raw/Extracted/Example Extracts/VR_Snapshot_2022_ACTIVE.dta")) %>%
+    #bind_rows(., read_dta(paste0(local_path, "data-raw/Extracted/Example Extracts/VR_Snapshot_2022_INACTIVETEMP.dta")))
+#anonymized <- sample_orig %>%
+    #distinct(ncid, .keep_all = TRUE) %>% # unique rows by NCID
+    #sample_frac(size = 1, replace = FALSE) %>% # shuffle rows
+    #mutate(ncid = row_number()) %>% # replace NCID with anonymized ID
+    #slice_sample(prop = .005) %>% # take a small random sample covering 0.5% of the 2022 registered voters from North Carolina
+    #select(ncid, house_num, half_code, street_dir, street_name, street_type_cd, street_sufx_cd, unit_designator, unit_num, res_city_desc, state_cd, zip_code) %>% # only keep address components and ID
+    #write_dta(., paste0(local_path, "data-raw/Extracted/Example Extracts/VR_Snapshot_2022_ALL_Anonymized.dta"))
 
 # URLs for relevant year 2022 data files (These are .zip files that need to be unzipped)
 extracts <- "https://www.dropbox.com/scl/fi/epopkf7wqtgs9ymod0w3h/Example-Extracts.zip?rlkey=mfuzylz2iinljy3f5te86fc1p&st=26tify0g&dl=1"

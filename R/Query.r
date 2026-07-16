@@ -222,11 +222,11 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, unit_zip
                             custom_query = list(vintage = vin), timeout = 50, min_time = 1) %>%
                             dplyr::mutate(across(everything(), as.character))
           
-                    success <- TRUE # flag successful communication with Census website
-          
                     # Now I can append temp to test
                     test <- dplyr::bind_rows(test, temp)
                     rm(temp, single_unit)
+
+                    success <- TRUE # flag successful communication with Census website
           
                     message("No fatal error ^_^")
           
@@ -261,11 +261,25 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, unit_zip
     
     # Turn coord (matched) coordinates into a point geometry
     if (is.null(coord) || nrow(coord) == 0) {
-        stop("No units were successfully geocoded. Please check your inputs and internet connection, then try again.")
+        stop("No units were successfully geocoded. Please check your inputs and internet connection,  and expected output from geocoder, then try again.")
     }
+
+    # Convert to sf object
+    coord <- dplyr::mutate(coord, longitude = as.numeric(longitude), latitude = as.numeric(latitude)) # need to be numeric
+    coerce_failed <- coord %>% dplyr::filter(is.na(.data$longitude) | is.na(.data$latitude))
+    if (nrow(coerce_failed) > 0) { # if any geocoding output could not be coverted properly, add to still_unmatched for Recover()
+        still_unmatched <- dplyr::bind_rows(still_unmatched, coerce_failed %>% dplyr::select(-longitude, -latitude))
+        coord <- coord %>% dplyr::filter(!.data$unit_id %in% coerce_failed$unit_id)
+    }
+
+    # Check coercion broadly worked before building geometry (geocoder could return long/lat in an unexpected format if it updates without me knowing)
+    if (sum(is.na(coord$longitude)) > (nrow(coord) * .95) || sum(is.na(coord$latitude)) > (nrow(coord) * .95)) {
+        stop("Very few, if any, units were successfully geocoded. Please check your inputs, internet connection, and expected output from geocoder, then try again.")
+    }
+
     coord <- sf::st_as_sf(coord, coords = c("longitude", "latitude"))
     sf::st_crs(coord) <- 4326 # This is the code for long/lat coordinates. See halfway down the page here: https://www.paulamoraga.com/book-spatial/the-sf-package-for-spatial-vector-data.html
-  
+
     # free some space
     rm(sample2, failed, grp_assign, sample_list, unitgroups, num, unitnum, id_count, sample2_ids)
     gc() # garbage collection

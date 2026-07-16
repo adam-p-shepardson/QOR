@@ -31,15 +31,18 @@ state_shape <- sf::read_sf(dsn = paste0(local_path, "data-raw/Extracted/North_Ca
 zip_shape <- sf::read_sf(dsn = paste0(local_path, "data-raw/Extracted/ZIP_2022"))
 district_shape <- sf::read_sf(dsn = paste0(local_path, "data-raw/Extracted/SCHOOL_SY2022"))
 
+small_test <- test %>%
+    dplyr::slice_sample(n = 5000) # take a small random sample of 5,000 addresses for testing
+
 # Query test
 test_query <- query(
-  units = test,
+  units = small_test,
   unit_id = "statevoterid",
   street = "street",
   city = "city",
   state = "state",
   state_shape = state_shape,
-  units_per_batch = 4000,
+  units_per_batch = 1000,
   method = "census",
   sleep_time = 2,
   year = 2025,
@@ -78,3 +81,8 @@ test_recover <- recover(
   FIPS_code = "37",
   FIPS_col = "STATEFP"
 )
+
+recovered <- test_recover[[1]]
+no_match <- test_recover[[2]]
+
+print(nrow(recovered) + nrow(no_match) + nrow(test_overlay) == nrow(small_test)) # check that all addresses are accounted for in the final output
