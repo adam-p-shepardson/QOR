@@ -269,7 +269,7 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, unit_zip
     n_before <- nrow(coord)
     coord <- coord %>% dplyr::mutate(longitude = as.numeric(longitude), latitude = as.numeric(latitude)) # need to be numeric
     coerce_failed <- coord %>% dplyr::filter(is.na(.data$longitude) | is.na(.data$latitude))
-    if (nrow(coerce_failed) > 0) { # if any geocoding output could not be coverted properly, add to still_unmatched for Recover()
+    if (nrow(coerce_failed) > 0) { # if any geocoding output long/lat could not be converted to numeric properly, add to still_unmatched for Recover()
         still_unmatched <- dplyr::bind_rows(still_unmatched, coerce_failed %>% dplyr::select(-longitude, -latitude))
         coord <- coord %>% dplyr::filter(!.data$unit_id %in% coerce_failed$unit_id)
     }
@@ -279,7 +279,7 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, unit_zip
     }
     isolate_coords <- as.matrix(coord[, c("longitude", "latitude")])
     storage.mode(isolate_coords) <- "double"
-    geo <- sf::st_sfc(sf::st_multipoint(isolate_coords), crs = sf::st_crs(4326)) %>% # This is the crs code for long/lat coordinates. See halfway down the page here: https://www.paulamoraga.com/book-spatial/the-sf-package-for-spatial-vector-data.html
+    geo <- sf::st_sfc(sf::st_multipoint(isolate_coords), crs = sf::st_crs(4269)) %>% # This is a crs code for long/lat coordinates, assuming NAD83 (Census standard). See one resource here: https://www.paulamoraga.com/book-spatial/the-sf-package-for-spatial-vector-data.html
         sf::st_cast("POINT")
     coord <- sf::st_sf(coord, geometry = geo)
 
@@ -288,10 +288,13 @@ units_per_batch = 4000, year = NULL, method = "census", sleep_time = 2, unit_zip
     gc() # garbage collection
   
     ## Now filter out any points that are outside the state shape (these will be considered unmatched)
-    # Clean up state geometry
-    state_shape <- state_shape %>%
-        sf::st_transform(., crs = sf::st_crs(coord)) %>% # sets the two objects to the same coordinate reference system.
-        sf::st_make_valid()  
+    # Ensure state_shape has comparable crs to voters
+    if (sf::st_is_longlat(state_shape)) {
+        state_shape <- sf::st_set_crs(state_shape, sf::st_crs(coord)) # if state is already in long/lat, just stamp with same crs as voters (minimal discrepency)
+    } else {
+        state_shape <- sf::st_transform(state_shape, sf::st_crs(coord)) # if state is not in long/lat, go through with the transform
+    }
+    state_shape <- sf::st_make_valid(state_shape) # clean up state geometry
 
     # Units placed outside state shape will be considered unmatched
     in_state <- sf::st_filter(coord, state_shape) 
