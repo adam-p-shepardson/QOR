@@ -27,6 +27,6 @@ https://doi.org/10.26300/bmh1-xr32
       title = {{QOR}: Functions to Identify Who Can Vote in What School District},
       author = {Adam Shepardson and Melissa Lyon and Beth Schueler and Joshua Bleiberg},
       year = {2026},
-      note = {R package version 0.9.3.0},
+      note = {R package version 0.9.4.0},
       url = {https://adam-p-shepardson.github.io/QOR},
     }
